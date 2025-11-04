@@ -17,8 +17,62 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup event listeners
 function setupEventListeners() {
+  document.getElementById('toggleProfileEdit').addEventListener('click', toggleProfileEditor);
   document.getElementById('saveProfile').addEventListener('click', handleSaveProfile);
+  document.getElementById('cancelEdit').addEventListener('click', hideProfileEditor);
   document.getElementById('startRecording').addEventListener('click', handleStartRecording);
+
+  // Enable/disable day times when checkbox changes
+  for (let day = 1; day <= 7; day++) {
+    const checkbox = document.getElementById(`day${day}Enabled`);
+    if (checkbox) {
+      checkbox.addEventListener('change', () => {
+        updateDayTimesState(day);
+      });
+    }
+  }
+}
+
+// Toggle profile editor visibility
+function toggleProfileEditor() {
+  const summary = document.getElementById('profileSummary');
+  const editor = document.getElementById('profileEditor');
+  const button = document.getElementById('toggleProfileEdit');
+
+  if (editor.style.display === 'none') {
+    summary.style.display = 'none';
+    editor.style.display = 'block';
+    button.textContent = '✖️';
+    button.title = 'Bearbeitung abbrechen';
+  } else {
+    hideProfileEditor();
+  }
+}
+
+// Hide profile editor
+function hideProfileEditor() {
+  const summary = document.getElementById('profileSummary');
+  const editor = document.getElementById('profileEditor');
+  const button = document.getElementById('toggleProfileEdit');
+
+  summary.style.display = 'block';
+  editor.style.display = 'none';
+  button.textContent = '✏️';
+  button.title = 'Profil bearbeiten';
+}
+
+// Update day times input state based on checkbox
+function updateDayTimesState(day) {
+  const checkbox = document.getElementById(`day${day}Enabled`);
+  const times = checkbox.closest('.day-schedule').querySelector('.day-times');
+
+  if (checkbox.checked) {
+    times.style.opacity = '1';
+    times.style.pointerEvents = 'auto';
+  } else {
+    times.style.opacity = '0.4';
+    times.style.pointerEvents = 'none';
+  }
 }
 
 // Check authentication status
@@ -63,16 +117,16 @@ async function loadWorkProfile() {
     if (profile) {
       currentWorkProfile = profile;
       populateFormWithProfile(profile);
+      updateProfileSummary(profile);
       updateProfileStatus(true);
       document.getElementById('startRecording').disabled = false;
     } else {
       updateProfileStatus(false);
-      // Set default values
-      setDefaultWorkDays();
+      setDefaultSchedule();
     }
   } catch (error) {
     console.error('Failed to load profile:', error);
-    setDefaultWorkDays();
+    setDefaultSchedule();
   }
 }
 
@@ -80,25 +134,97 @@ async function loadWorkProfile() {
 function populateFormWithProfile(profile) {
   document.getElementById('personioInstance').value = profile.personioInstance || '';
   document.getElementById('employeeId').value = profile.employeeId || '';
-  document.getElementById('workStart').value = profile.workStart || '08:00';
-  document.getElementById('workEnd').value = profile.workEnd || '17:00';
-  document.getElementById('breakStart').value = profile.breakStart || '12:00';
-  document.getElementById('breakEnd').value = profile.breakEnd || '13:00';
   document.getElementById('timezone').value = profile.timezone || 'Europe/Berlin';
 
-  // Set working days
-  const checkboxes = document.querySelectorAll('.workday-checkbox');
-  checkboxes.forEach(cb => {
-    cb.checked = profile.workingDays.includes(parseInt(cb.value));
-  });
+  // Populate per-day schedule
+  if (profile.schedule) {
+    for (let day = 1; day <= 7; day++) {
+      const daySchedule = profile.schedule[day];
+      const checkbox = document.getElementById(`day${day}Enabled`);
+
+      if (daySchedule) {
+        checkbox.checked = daySchedule.enabled;
+        document.getElementById(`day${day}WorkStart`).value = daySchedule.workStart || '08:00';
+        document.getElementById(`day${day}WorkEnd`).value = daySchedule.workEnd || '17:00';
+        document.getElementById(`day${day}BreakStart`).value = daySchedule.breakStart || '12:00';
+        document.getElementById(`day${day}BreakEnd`).value = daySchedule.breakEnd || '13:00';
+        updateDayTimesState(day);
+      }
+    }
+  } else {
+    // Migrate old profile format
+    setDefaultSchedule();
+    if (profile.workingDays) {
+      profile.workingDays.forEach(day => {
+        document.getElementById(`day${day}Enabled`).checked = true;
+        updateDayTimesState(day);
+      });
+    }
+  }
 }
 
-// Set default work days (Monday to Friday)
-function setDefaultWorkDays() {
-  const checkboxes = document.querySelectorAll('.workday-checkbox');
-  checkboxes.forEach(cb => {
-    cb.checked = parseInt(cb.value) >= 1 && parseInt(cb.value) <= 5;
-  });
+// Update profile summary display
+function updateProfileSummary(profile) {
+  document.getElementById('summaryInstance').textContent = profile.personioInstance || '-';
+  document.getElementById('summaryEmployeeId').textContent = profile.employeeId || '-';
+
+  // Build workdays summary
+  const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+  const workdays = [];
+
+  if (profile.schedule) {
+    for (let day = 1; day <= 7; day++) {
+      if (profile.schedule[day]?.enabled) {
+        workdays.push(dayNames[day === 7 ? 0 : day]);
+      }
+    }
+  }
+
+  document.getElementById('summaryWorkdays').textContent = workdays.join(', ') || '-';
+
+  // Build schedule details
+  const scheduleContainer = document.getElementById('summarySchedule');
+  scheduleContainer.innerHTML = '';
+
+  if (profile.schedule) {
+    const fullDayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+
+    for (let day = 1; day <= 7; day++) {
+      const daySchedule = profile.schedule[day];
+      if (daySchedule?.enabled) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'summary-day';
+
+        const dayName = document.createElement('span');
+        dayName.className = 'summary-day-name';
+        dayName.textContent = fullDayNames[day === 7 ? 0 : day];
+
+        const dayTimes = document.createElement('span');
+        dayTimes.className = 'summary-day-times';
+        dayTimes.textContent = `${daySchedule.workStart}-${daySchedule.workEnd} (Pause: ${daySchedule.breakStart}-${daySchedule.breakEnd})`;
+
+        dayDiv.appendChild(dayName);
+        dayDiv.appendChild(dayTimes);
+        scheduleContainer.appendChild(dayDiv);
+      }
+    }
+  }
+}
+
+// Set default schedule (Monday-Friday)
+function setDefaultSchedule() {
+  for (let day = 1; day <= 7; day++) {
+    const checkbox = document.getElementById(`day${day}Enabled`);
+    checkbox.checked = day >= 1 && day <= 5; // Monday-Friday
+
+    // Default times
+    document.getElementById(`day${day}WorkStart`).value = '08:00';
+    document.getElementById(`day${day}WorkEnd`).value = day === 5 ? '13:00' : '17:00'; // Friday shorter
+    document.getElementById(`day${day}BreakStart`).value = '12:00';
+    document.getElementById(`day${day}BreakEnd`).value = day === 5 ? '12:30' : '13:00';
+
+    updateDayTimesState(day);
+  }
 }
 
 // Update profile status display
@@ -121,17 +247,32 @@ async function handleSaveProfile() {
   saveBtn.textContent = 'Speichern...';
 
   try {
-    // Collect form data
+    // Collect form data with per-day schedule
+    const schedule = {};
+    const workingDays = [];
+
+    for (let day = 1; day <= 7; day++) {
+      const enabled = document.getElementById(`day${day}Enabled`).checked;
+
+      if (enabled) {
+        workingDays.push(day);
+      }
+
+      schedule[day] = {
+        enabled: enabled,
+        workStart: document.getElementById(`day${day}WorkStart`).value,
+        workEnd: document.getElementById(`day${day}WorkEnd`).value,
+        breakStart: document.getElementById(`day${day}BreakStart`).value,
+        breakEnd: document.getElementById(`day${day}BreakEnd`).value
+      };
+    }
+
     const profile = {
       personioInstance: document.getElementById('personioInstance').value.trim(),
       employeeId: document.getElementById('employeeId').value.trim(),
-      workingDays: Array.from(document.querySelectorAll('.workday-checkbox:checked'))
-        .map(cb => parseInt(cb.value)),
-      workStart: document.getElementById('workStart').value,
-      workEnd: document.getElementById('workEnd').value,
-      breakStart: document.getElementById('breakStart').value,
-      breakEnd: document.getElementById('breakEnd').value,
-      timezone: document.getElementById('timezone').value
+      timezone: document.getElementById('timezone').value,
+      schedule: schedule,
+      workingDays: workingDays // Keep for backwards compatibility
     };
 
     // Validate profile
@@ -146,7 +287,9 @@ async function handleSaveProfile() {
     currentWorkProfile = profile;
 
     // Update UI
+    updateProfileSummary(profile);
     updateProfileStatus(true);
+    hideProfileEditor();
     document.getElementById('startRecording').disabled = false;
 
     // Re-check authentication with new instance

@@ -52,42 +52,55 @@ function validateWorkProfile(profile) {
   // Time format validation (HH:MM)
   const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/;
 
-  if (!timeRegex.test(profile.workStart)) {
-    errors.push('Arbeitsbeginn muss im Format HH:MM sein');
-  }
+  // Validate per-day schedule
+  if (profile.schedule) {
+    let hasAtLeastOneDay = false;
 
-  if (!timeRegex.test(profile.workEnd)) {
-    errors.push('Arbeitsende muss im Format HH:MM sein');
-  }
+    for (let day = 1; day <= 7; day++) {
+      const daySchedule = profile.schedule[day];
 
-  if (!timeRegex.test(profile.breakStart)) {
-    errors.push('Pausenbeginn muss im Format HH:MM sein');
-  }
+      if (daySchedule && daySchedule.enabled) {
+        hasAtLeastOneDay = true;
 
-  if (!timeRegex.test(profile.breakEnd)) {
-    errors.push('Pausenende muss im Format HH:MM sein');
-  }
+        if (!timeRegex.test(daySchedule.workStart)) {
+          errors.push(`Tag ${day}: Arbeitsbeginn muss im Format HH:MM sein`);
+        }
 
-  // Logical validations
-  if (profile.workStart >= profile.workEnd) {
-    errors.push('Arbeitsende muss nach Arbeitsbeginn liegen');
-  }
+        if (!timeRegex.test(daySchedule.workEnd)) {
+          errors.push(`Tag ${day}: Arbeitsende muss im Format HH:MM sein`);
+        }
 
-  if (profile.breakStart >= profile.breakEnd) {
-    errors.push('Pausenende muss nach Pausenbeginn liegen');
-  }
+        if (!timeRegex.test(daySchedule.breakStart)) {
+          errors.push(`Tag ${day}: Pausenbeginn muss im Format HH:MM sein`);
+        }
 
-  if (profile.breakStart < profile.workStart || profile.breakEnd > profile.workEnd) {
-    errors.push('Pause muss innerhalb der Arbeitszeit liegen');
-  }
+        if (!timeRegex.test(daySchedule.breakEnd)) {
+          errors.push(`Tag ${day}: Pausenende muss im Format HH:MM sein`);
+        }
 
-  // Working days
-  if (!Array.isArray(profile.workingDays) || profile.workingDays.length === 0) {
-    errors.push('Mindestens ein Arbeitstag muss ausgewählt sein');
-  }
+        // Logical validations
+        if (daySchedule.workStart >= daySchedule.workEnd) {
+          errors.push(`Tag ${day}: Arbeitsende muss nach Arbeitsbeginn liegen`);
+        }
 
-  if (profile.workingDays.some(d => d < 1 || d > 7)) {
-    errors.push('Arbeitstage müssen zwischen 1 (Montag) und 7 (Sonntag) liegen');
+        if (daySchedule.breakStart >= daySchedule.breakEnd) {
+          errors.push(`Tag ${day}: Pausenende muss nach Pausenbeginn liegen`);
+        }
+
+        if (daySchedule.breakStart < daySchedule.workStart || daySchedule.breakEnd > daySchedule.workEnd) {
+          errors.push(`Tag ${day}: Pause muss innerhalb der Arbeitszeit liegen`);
+        }
+      }
+    }
+
+    if (!hasAtLeastOneDay) {
+      errors.push('Mindestens ein Arbeitstag muss aktiviert sein');
+    }
+  } else {
+    // Fallback validation for old format
+    if (!Array.isArray(profile.workingDays) || profile.workingDays.length === 0) {
+      errors.push('Mindestens ein Arbeitstag muss ausgewählt sein');
+    }
   }
 
   return {

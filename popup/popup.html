@@ -24,86 +24,182 @@
 
     <!-- Profile Section -->
     <section class="profile-section">
-      <h2>Arbeitszeitprofil</h2>
-
-      <div class="form-group">
-        <label for="personioInstance">Personio Instanz:</label>
-        <input type="text" id="personioInstance" placeholder="z.B. aoe-gmbh.app.personio.com">
-        <small>Vollständige Domain ohne https://</small>
+      <div class="section-header">
+        <h2>Arbeitszeitprofil</h2>
+        <button id="toggleProfileEdit" class="btn btn-icon" title="Profil bearbeiten">✏️</button>
       </div>
 
-      <div class="form-group">
-        <label for="employeeId">Mitarbeiter-ID:</label>
-        <input type="text" id="employeeId" placeholder="z.B. 13011272">
-        <small>Ihre numerische Personio Mitarbeiter-ID</small>
-      </div>
-
-      <div class="form-group">
-        <label>Arbeitstage:</label>
-        <div class="weekday-selector">
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="1" class="workday-checkbox">
-            <span>Mo</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="2" class="workday-checkbox">
-            <span>Di</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="3" class="workday-checkbox">
-            <span>Mi</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="4" class="workday-checkbox">
-            <span>Do</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="5" class="workday-checkbox">
-            <span>Fr</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="6" class="workday-checkbox">
-            <span>Sa</span>
-          </label>
-          <label class="weekday-checkbox">
-            <input type="checkbox" value="7" class="workday-checkbox">
-            <span>So</span>
-          </label>
+      <!-- Profile Summary (shown by default) -->
+      <div id="profileSummary" class="profile-summary">
+        <div class="summary-item">
+          <span class="summary-label">Instanz:</span>
+          <span id="summaryInstance">-</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Mitarbeiter-ID:</span>
+          <span id="summaryEmployeeId">-</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Arbeitstage:</span>
+          <span id="summaryWorkdays">-</span>
+        </div>
+        <div class="summary-schedule" id="summarySchedule">
+          <!-- Will be populated dynamically -->
         </div>
       </div>
 
-      <div class="form-row">
+      <!-- Profile Editor (hidden by default) -->
+      <div id="profileEditor" class="profile-editor" style="display: none;">
         <div class="form-group">
-          <label for="workStart">Arbeitsbeginn:</label>
-          <input type="time" id="workStart" value="08:00">
+          <label for="personioInstance">Personio Instanz:</label>
+          <input type="text" id="personioInstance" placeholder="z.B. aoe-gmbh.app.personio.com">
+          <small>Vollständige Domain ohne https://</small>
         </div>
+
         <div class="form-group">
-          <label for="workEnd">Arbeitsende:</label>
-          <input type="time" id="workEnd" value="17:00">
+          <label for="employeeId">Mitarbeiter-ID:</label>
+          <input type="text" id="employeeId" placeholder="z.B. 13011272">
+          <small>Ihre numerische Personio Mitarbeiter-ID</small>
+        </div>
+
+        <div class="form-group">
+          <label for="timezone">Zeitzone:</label>
+          <select id="timezone">
+            <option value="Europe/Berlin" selected>Europe/Berlin</option>
+            <option value="Europe/Vienna">Europe/Vienna</option>
+            <option value="Europe/Zurich">Europe/Zurich</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Arbeitszeiten pro Wochentag:</label>
+          <div class="weekday-schedule">
+            <!-- Monday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="1" class="day-enabled" id="day1Enabled">
+                <span class="day-name">Montag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day1WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day1WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day1BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day1BreakEnd" value="13:00">
+              </div>
+            </div>
+
+            <!-- Tuesday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="2" class="day-enabled" id="day2Enabled">
+                <span class="day-name">Dienstag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day2WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day2WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day2BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day2BreakEnd" value="13:00">
+              </div>
+            </div>
+
+            <!-- Wednesday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="3" class="day-enabled" id="day3Enabled">
+                <span class="day-name">Mittwoch</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day3WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day3WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day3BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day3BreakEnd" value="13:00">
+              </div>
+            </div>
+
+            <!-- Thursday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="4" class="day-enabled" id="day4Enabled">
+                <span class="day-name">Donnerstag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day4WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day4WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day4BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day4BreakEnd" value="13:00">
+              </div>
+            </div>
+
+            <!-- Friday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="5" class="day-enabled" id="day5Enabled">
+                <span class="day-name">Freitag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day5WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day5WorkEnd" value="13:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day5BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day5BreakEnd" value="12:30">
+              </div>
+            </div>
+
+            <!-- Saturday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="6" class="day-enabled" id="day6Enabled">
+                <span class="day-name">Samstag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day6WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day6WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day6BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day6BreakEnd" value="13:00">
+              </div>
+            </div>
+
+            <!-- Sunday -->
+            <div class="day-schedule">
+              <label class="day-toggle">
+                <input type="checkbox" value="7" class="day-enabled" id="day7Enabled">
+                <span class="day-name">Sonntag</span>
+              </label>
+              <div class="day-times">
+                <input type="time" class="day-work-start" id="day7WorkStart" value="08:00">
+                <span>-</span>
+                <input type="time" class="day-work-end" id="day7WorkEnd" value="17:00">
+                <span class="time-separator">Pause:</span>
+                <input type="time" class="day-break-start" id="day7BreakStart" value="12:00">
+                <span>-</span>
+                <input type="time" class="day-break-end" id="day7BreakEnd" value="13:00">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="saveProfile" class="btn btn-primary">Profil speichern</button>
+          <button id="cancelEdit" class="btn btn-secondary">Abbrechen</button>
         </div>
       </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="breakStart">Pausenbeginn:</label>
-          <input type="time" id="breakStart" value="12:00">
-        </div>
-        <div class="form-group">
-          <label for="breakEnd">Pausenende:</label>
-          <input type="time" id="breakEnd" value="13:00">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="timezone">Zeitzone:</label>
-        <select id="timezone">
-          <option value="Europe/Berlin" selected>Europe/Berlin</option>
-          <option value="Europe/Vienna">Europe/Vienna</option>
-          <option value="Europe/Zurich">Europe/Zurich</option>
-        </select>
-      </div>
-
-      <button id="saveProfile" class="btn btn-secondary">Profil speichern</button>
     </section>
 
     <!-- Action Section -->

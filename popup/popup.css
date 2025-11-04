@@ -90,11 +90,175 @@ section h2 {
   color: #1f2937;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-header h2 {
+  margin: 0;
+}
+
 section h3 {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 10px;
   color: #1f2937;
+}
+
+/* Profile Summary */
+.profile-summary {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.summary-item span:last-child {
+  color: #1f2937;
+  font-size: 13px;
+}
+
+.summary-schedule {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.summary-day {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.summary-day-name {
+  font-weight: 500;
+  color: #374151;
+  min-width: 60px;
+}
+
+.summary-day-times {
+  color: #6b7280;
+  font-family: 'Courier New', monospace;
+}
+
+/* Profile Editor */
+.profile-editor {
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Weekday Schedule */
+.weekday-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.day-schedule {
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.day-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  margin-bottom: 8px;
+}
+
+.day-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.day-name {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.day-times {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-left: 26px;
+}
+
+.day-times input[type="time"] {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 80px;
+}
+
+.day-times span {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.time-separator {
+  margin-left: 8px;
+  font-weight: 500;
+}
+
+.day-schedule:has(.day-enabled:not(:checked)) .day-times {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.button-group .btn {
+  flex: 1;
+}
+
+.btn-icon {
+  width: auto;
+  padding: 8px 12px;
+  font-size: 16px;
+  min-width: 40px;
 }
 
 /* Form Elements */

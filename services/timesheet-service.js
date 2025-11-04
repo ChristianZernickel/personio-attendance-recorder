@@ -59,16 +59,31 @@ class TimesheetService {
    * Generate periods for a day based on work profile
    * @param {string} date - YYYY-MM-DD
    * @param {Object} workProfile
+   * @param {number} dayOfWeek - ISO day of week (1=Monday, 7=Sunday)
    * @returns {Array} Array of period objects
    */
-  generatePeriodsForDay(date, workProfile) {
+  generatePeriodsForDay(date, workProfile, dayOfWeek) {
     const periods = [];
+
+    // Get schedule for this specific day
+    let daySchedule;
+    if (workProfile.schedule && workProfile.schedule[dayOfWeek]) {
+      daySchedule = workProfile.schedule[dayOfWeek];
+    } else {
+      // Fallback to old format
+      daySchedule = {
+        workStart: workProfile.workStart || '08:00',
+        workEnd: workProfile.workEnd || '17:00',
+        breakStart: workProfile.breakStart || '12:00',
+        breakEnd: workProfile.breakEnd || '13:00'
+      };
+    }
 
     // Period 1: Work from start to break start
     periods.push({
       attendance_period_id: generateUUID(),
-      start: `${date} ${workProfile.workStart}:00`,
-      end: `${date} ${workProfile.breakStart}:00`,
+      start: `${date} ${daySchedule.workStart}:00`,
+      end: `${date} ${daySchedule.breakStart}:00`,
       period_type: 'work',
       comment: null,
       project_id: null
@@ -77,8 +92,8 @@ class TimesheetService {
     // Period 2: Break
     periods.push({
       attendance_period_id: generateUUID(),
-      start: `${date} ${workProfile.breakStart}:00`,
-      end: `${date} ${workProfile.breakEnd}:00`,
+      start: `${date} ${daySchedule.breakStart}:00`,
+      end: `${date} ${daySchedule.breakEnd}:00`,
       period_type: 'break',
       comment: null,
       project_id: null
@@ -87,8 +102,8 @@ class TimesheetService {
     // Period 3: Work from break end to work end
     periods.push({
       attendance_period_id: generateUUID(),
-      start: `${date} ${workProfile.breakEnd}:00`,
-      end: `${date} ${workProfile.workEnd}:00`,
+      start: `${date} ${daySchedule.breakEnd}:00`,
+      end: `${date} ${daySchedule.workEnd}:00`,
       period_type: 'work',
       comment: null,
       project_id: null

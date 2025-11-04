@@ -72,7 +72,11 @@ class AttendanceService {
 
       try {
         // Generate periods for this day
-        const periods = this.timesheetService.generatePeriodsForDay(day.date, workProfile);
+        const date = new Date(day.date);
+        const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+        const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert to ISO (1=Monday, 7=Sunday)
+
+        const periods = this.timesheetService.generatePeriodsForDay(day.date, workProfile, isoDayOfWeek);
 
         // Record the day
         const result = await this.recordDayWithRetry(dayId, employeeId, periods);
