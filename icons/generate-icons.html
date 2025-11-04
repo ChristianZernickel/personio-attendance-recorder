@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Icon Generator</title>
+</head>
+<body>
+  <h1>Icon Generator für Personio Attendance Recorder</h1>
+  <p>Öffnen Sie diese Datei im Browser und speichern Sie die generierten Icons.</p>
+
+  <!-- 128x128 -->
+  <h2>128x128 Icon:</h2>
+  <canvas id="icon128" width="128" height="128"></canvas>
+  <br><button onclick="download('icon128', 'icon128.png')">Download 128x128</button>
+
+  <!-- 48x48 -->
+  <h2>48x48 Icon:</h2>
+  <canvas id="icon48" width="48" height="48"></canvas>
+  <br><button onclick="download('icon48', 'icon48.png')">Download 48x48</button>
+
+  <!-- 16x16 -->
+  <h2>16x16 Icon:</h2>
+  <canvas id="icon16" width="16" height="16"></canvas>
+  <br><button onclick="download('icon16', 'icon16.png')">Download 16x16</button>
+
+  <script>
+    // Generate icon at specific size
+    function generateIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+
+      // Gradient background
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+
+      // Draw rounded rectangle
+      const radius = size * 0.2;
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.roundRect(0, 0, size, size, radius);
+      ctx.fill();
+
+      // Draw "P" text
+      ctx.fillStyle = 'white';
+      ctx.font = `bold ${size * 0.6}px Arial`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('P', size / 2, size / 2);
+    }
+
+    // Download canvas as PNG
+    function download(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+    }
+
+    // Generate all icons on load
+    window.onload = function() {
+      generateIcon('icon128', 128);
+      generateIcon('icon48', 48);
+      generateIcon('icon16', 16);
+    };
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,31 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Node modules (if using build tools later)
+node_modules/
+package-lock.json
+yarn.lock
+
+# Chrome extension artifacts
+*.crx
+*.pem
+
+# Temporary files
+*.tmp
+*.temp
+

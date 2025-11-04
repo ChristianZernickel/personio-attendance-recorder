@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personio Attendance Recorder</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header">
+      <h1>Personio Attendance Recorder</h1>
+      <p class="version">v0.1.0</p>
+    </header>
+
+    <!-- Status Section -->
+    <section class="status-section">
+      <div id="authStatus" class="status-badge">
+        <span id="authStatusIcon">⏳</span>
+        <span id="authStatusText">Prüfe Authentifizierung...</span>
+      </div>
+    </section>
+
+    <!-- Profile Section -->
+    <section class="profile-section">
+      <h2>Arbeitszeitprofil</h2>
+
+      <div class="form-group">
+        <label for="personioInstance">Personio Instanz:</label>
+        <input type="text" id="personioInstance" placeholder="z.B. aoe-gmbh.app.personio.com">
+        <small>Vollständige Domain ohne https://</small>
+      </div>
+
+      <div class="form-group">
+        <label for="employeeId">Mitarbeiter-ID:</label>
+        <input type="text" id="employeeId" placeholder="z.B. 13011272">
+        <small>Ihre numerische Personio Mitarbeiter-ID</small>
+      </div>
+
+      <div class="form-group">
+        <label>Arbeitstage:</label>
+        <div class="weekday-selector">
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="1" class="workday-checkbox">
+            <span>Mo</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="2" class="workday-checkbox">
+            <span>Di</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="3" class="workday-checkbox">
+            <span>Mi</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="4" class="workday-checkbox">
+            <span>Do</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="5" class="workday-checkbox">
+            <span>Fr</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="6" class="workday-checkbox">
+            <span>Sa</span>
+          </label>
+          <label class="weekday-checkbox">
+            <input type="checkbox" value="7" class="workday-checkbox">
+            <span>So</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="workStart">Arbeitsbeginn:</label>
+          <input type="time" id="workStart" value="08:00">
+        </div>
+        <div class="form-group">
+          <label for="workEnd">Arbeitsende:</label>
+          <input type="time" id="workEnd" value="17:00">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="breakStart">Pausenbeginn:</label>
+          <input type="time" id="breakStart" value="12:00">
+        </div>
+        <div class="form-group">
+          <label for="breakEnd">Pausenende:</label>
+          <input type="time" id="breakEnd" value="13:00">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="timezone">Zeitzone:</label>
+        <select id="timezone">
+          <option value="Europe/Berlin" selected>Europe/Berlin</option>
+          <option value="Europe/Vienna">Europe/Vienna</option>
+          <option value="Europe/Zurich">Europe/Zurich</option>
+        </select>
+      </div>
+
+      <button id="saveProfile" class="btn btn-secondary">Profil speichern</button>
+    </section>
+
+    <!-- Action Section -->
+    <section class="action-section">
+      <h2>Zeiterfassung</h2>
+
+      <div id="profileStatus" class="info-box">
+        <p>Bitte zuerst Profil konfigurieren und speichern.</p>
+      </div>
+
+      <button id="startRecording" class="btn btn-primary" disabled>
+        Zeiterfassung starten
+      </button>
+    </section>
+
+    <!-- Progress Section -->
+    <section id="progressSection" class="progress-section" style="display: none;">
+      <h3>Fortschritt</h3>
+      <div class="progress-bar">
+        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+      </div>
+      <p id="progressText" class="progress-text">0 / 0</p>
+      <div id="progressLog" class="progress-log"></div>
+    </section>
+
+    <!-- Result Section -->
+    <section id="resultSection" class="result-section" style="display: none;">
+      <h3>Ergebnis</h3>
+      <div id="resultSummary" class="result-summary"></div>
+      <div id="resultDetails" class="result-details"></div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Made with ❤️ for Personio users</p>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../utils/helpers.js"></script>
+  <script src="../services/auth-manager.js"></script>
+  <script src="../services/api-client.js"></script>
+  <script src="../services/timesheet-service.js"></script>
+  <script src="../services/attendance-service.js"></script>
+  <script src="../storage/storage-manager.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
+
