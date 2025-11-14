@@ -16,16 +16,24 @@ class TimesheetService {
   }
 
   /**
-   * Filter timecards to get recordable days
-   * @param {Object} timesheet - Timesheet response from API
+   * Get timesheet for custom date range
+   * @param {string|number} employeeId
+   * @param {string} startDate - YYYY-MM-DD
+   * @param {string} endDate - YYYY-MM-DD
+   * @param {string} timezone
+   * @returns {Promise<Object>}
+   */
+  async getTimesheet(employeeId, startDate, endDate, timezone = 'Europe/Berlin') {
+    return await this.apiClient.fetchTimesheet(employeeId, startDate, endDate, timezone);
+  }
+
+  /**
+   * Filter timesheet to get recordable days based on work profile
+   * @param {Object} timesheet - Full timesheet response
    * @param {Object} workProfile - User's work profile
-   * @returns {Array} Array of timecards that should be recorded
+   * @returns {Array} Array of recordable day objects
    */
   getRecordableDays(timesheet, workProfile) {
-    if (!timesheet.timecards || !Array.isArray(timesheet.timecards)) {
-      return [];
-    }
-
     return timesheet.timecards.filter(card => {
       // Check 1: Must be trackable
       if (card.state !== 'trackable') {

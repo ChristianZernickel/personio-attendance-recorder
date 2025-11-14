@@ -197,54 +197,96 @@
 
         <div class="button-group">
           <button id="saveProfile" class="btn btn-primary">Profil speichern</button>
-          <button id="cancelEdit" class="btn btn-secondary">Abbrechen</button>
         </div>
       </div>
     </section>
 
-    <!-- Action Section -->
+    <!-- Tab Navigation -->
     <section class="action-section">
-      <h2>Zeiterfassung</h2>
-
-      <div id="profileStatus" class="info-box">
-        <p>Bitte zuerst Profil konfigurieren und speichern.</p>
+      <div class="tab-navigation">
+        <button id="tabProfile" class="tab-btn active">📅 Profil</button>
+        <button id="tabImport" class="tab-btn">📥 Import</button>
       </div>
 
-      <button id="startRecording" class="btn btn-primary" disabled>
-        Zeiterfassung starten
-      </button>
-    </section>
+      <!-- Tab Content: Profile -->
+      <div id="profileTab" class="tab-content active">
+        <div id="profileStatus" class="info-box">
+          <p>Bitte zuerst Profil konfigurieren und speichern.</p>
+        </div>
 
-    <!-- Progress Section -->
-    <section id="progressSection" class="progress-section" style="display: none;">
-      <h3>Fortschritt</h3>
-      <div class="progress-bar">
-        <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        <button id="startRecording" class="btn btn-primary btn-large" disabled>
+          Zeiterfassung starten
+        </button>
+
+        <!-- Progress Section (Profile) -->
+        <div id="progressSection" class="progress-section" style="display: none;">
+          <h3>Fortschritt</h3>
+          <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <p id="progressText" class="progress-text">0 / 0</p>
+          <div id="progressLog" class="progress-log"></div>
+        </div>
+
+        <!-- Result Section (Profile) -->
+        <div id="resultSection" class="result-section" style="display: none;">
+          <h3>Ergebnis</h3>
+          <div id="resultSummary" class="result-summary"></div>
+          <div id="resultDetails" class="result-details"></div>
+        </div>
       </div>
-      <p id="progressText" class="progress-text">0 / 0</p>
-      <div id="progressLog" class="progress-log"></div>
-    </section>
 
-    <!-- Result Section -->
-    <section id="resultSection" class="result-section" style="display: none;">
-      <h3>Ergebnis</h3>
-      <div id="resultSummary" class="result-summary"></div>
-      <div id="resultDetails" class="result-details"></div>
-    </section>
+      <!-- Tab Content: Import -->
+      <div id="importTab" class="tab-content">
+        <div class="import-section">
+          <h3>📥 Zeiten aus Datei importieren</h3>
+          <p class="import-description">
+            Importiere Arbeitszeiten aus einer JSON-Datei.
+            Bereits eingetragene Tage werden automatisch übersprungen.
+          </p>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <p>Made with ❤️ for Personio users</p>
-    </footer>
+          <div class="form-group">
+            <label for="importFile" class="btn btn-secondary">
+              📁 Datei auswählen...
+            </label>
+            <input type="file" id="importFile" accept=".json,application/json" style="display: none;">
+          </div>
+
+          <div id="fileInfo"></div>
+
+          <button id="startImport" class="btn btn-primary btn-large" disabled>
+            Zeiten importieren
+          </button>
+
+          <!-- Progress Section (Import) -->
+          <div id="importProgressSection" class="progress-section" style="display: none;">
+            <h3>Import-Fortschritt</h3>
+            <div class="progress-bar">
+              <div id="importProgressFill" class="progress-fill"></div>
+            </div>
+            <p id="importProgressText" class="progress-text">0 / 0</p>
+            <div id="importProgressLog" class="progress-log"></div>
+          </div>
+
+          <!-- Result Section (Import) -->
+          <div id="importResultSection" class="result-section" style="display: none;">
+            <h3>Import-Ergebnis</h3>
+            <div id="importResultSummary" class="result-summary"></div>
+            <div id="importResultDetails" class="result-details"></div>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- Scripts -->
   <script src="../utils/helpers.js"></script>
+  <script src="../storage/storage-manager.js"></script>
   <script src="../services/auth-manager.js"></script>
   <script src="../services/api-client.js"></script>
   <script src="../services/timesheet-service.js"></script>
   <script src="../services/attendance-service.js"></script>
-  <script src="../storage/storage-manager.js"></script>
+  <script src="../services/time-import-service.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

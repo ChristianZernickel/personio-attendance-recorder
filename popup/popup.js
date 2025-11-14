@@ -1,7 +1,9 @@
 // Popup Script - Main UI Logic
 let authManager;
 let storageManager;
-let currentWorkProfile = null;
+let timeImportService;
+let currentWorkProfile;
+let importedData = null;
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -9,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   authManager = new AuthManager();
   storageManager = new StorageManager();
+  timeImportService = new TimeImportService();
 
   await loadWorkProfile();
   await checkAuthentication();
@@ -17,20 +20,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Profile editor
   document.getElementById('toggleProfileEdit').addEventListener('click', toggleProfileEditor);
   document.getElementById('saveProfile').addEventListener('click', handleSaveProfile);
-  document.getElementById('cancelEdit').addEventListener('click', hideProfileEditor);
   document.getElementById('startRecording').addEventListener('click', handleStartRecording);
 
   // Enable/disable day times when checkbox changes
   for (let day = 1; day <= 7; day++) {
     const checkbox = document.getElementById(`day${day}Enabled`);
-    if (checkbox) {
-      checkbox.addEventListener('change', () => {
-        updateDayTimesState(day);
-      });
-    }
+    checkbox.addEventListener('change', () => updateDayTimesState(day));
   }
+
+  // Tab events
+  document.getElementById('tabProfile').addEventListener('click', () => switchTab('profile'));
+  document.getElementById('tabImport').addEventListener('click', () => switchTab('import'));
+
+  // Import events
+  document.getElementById('importFile').addEventListener('change', handleFileSelect);
+  document.getElementById('startImport').addEventListener('click', handleStartImport);
+}
+
+// Switch between tabs
+function switchTab(tab) {
+  // Update tab buttons
+  document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+
+  // Update tab content
+  document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+  document.getElementById(`${tab}Tab`).classList.add('active');
 }
 
 // Toggle profile editor visibility
@@ -309,7 +327,31 @@ async function handleSaveProfile() {
   }
 }
 
-// Handle start recording
+// Validate work profile
+function validateWorkProfile(profile) {
+  const errors = [];
+
+  if (!profile.personioInstance) {
+    errors.push('Personio Instanz fehlt');
+  }
+
+  if (!profile.employeeId) {
+    errors.push('Employee ID fehlt');
+  }
+
+  // Check if at least one day is enabled
+  const hasEnabledDay = Object.values(profile.schedule).some(day => day.enabled);
+  if (!hasEnabledDay) {
+    errors.push('Mindestens ein Arbeitstag muss aktiviert sein');
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors: errors
+  };
+}
+
+// Handle start recording (Profile-based)
 async function handleStartRecording() {
   if (!currentWorkProfile) {
     alert('Bitte zuerst Profil speichern!');
@@ -326,7 +368,7 @@ async function handleStartRecording() {
   document.getElementById('progressLog').innerHTML = '';
 
   try {
-    // Verify auth works (will throw if not logged in)
+    // Verify auth works
     addProgressLog('🔑 Prüfe Authentifizierung...');
     const testAuth = await authManager.extractAuthData(currentWorkProfile.personioInstance);
 
@@ -336,7 +378,7 @@ async function handleStartRecording() {
 
     addProgressLog('✅ Authentifizierung OK');
 
-    // Initialize services - Pass authManager so it can get fresh cookies!
+    // Initialize services
     const apiClient = new PersonioAPIClient(currentWorkProfile.personioInstance, authManager);
     const timesheetService = new TimesheetService(apiClient);
     const attendanceService = new AttendanceService(apiClient, timesheetService);
@@ -391,6 +433,135 @@ async function handleStartRecording() {
   }
 }
 
+// Handle file selection for import
+async function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileInfo = document.getElementById('fileInfo');
+  const startImportBtn = document.getElementById('startImport');
+
+  try {
+    // Read and parse JSON file
+    const text = await file.text();
+    const data = JSON.parse(text);
+
+    // Parse the import data
+    const parsed = timeImportService.parseImportData(data);
+
+    importedData = parsed;
+
+    // Show file info
+    fileInfo.innerHTML = `
+      <div class="info-box success">
+        <p><strong>✅ Datei geladen:</strong> ${file.name}</p>
+        <p>${parsed.totalDays} Tag(e) gefunden</p>
+        <p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>
+      </div>
+    `;
+
+    startImportBtn.disabled = false;
+
+  } catch (error) {
+    console.error('File parse error:', error);
+    fileInfo.innerHTML = `
+      <div class="info-box error">
+        <p><strong>❌ Fehler beim Lesen der Datei:</strong></p>
+        <p>${error.message}</p>
+      </div>
+    `;
+    importedData = null;
+    startImportBtn.disabled = true;
+  }
+}
+
+// Handle start import
+async function handleStartImport() {
+  if (!importedData) {
+    alert('Bitte zuerst eine Datei auswählen!');
+    return;
+  }
+
+  if (!currentWorkProfile) {
+    alert('Bitte zuerst Profil speichern (für Personio-Zugangsdaten)!');
+    return;
+  }
+
+  const startBtn = document.getElementById('startImport');
+  startBtn.disabled = true;
+  startBtn.textContent = 'Importiere...';
+
+  // Hide result section, show progress
+  document.getElementById('importResultSection').style.display = 'none';
+  document.getElementById('importProgressSection').style.display = 'block';
+  document.getElementById('importProgressLog').innerHTML = '';
+
+  try {
+    // Verify auth
+    addImportProgressLog('🔑 Prüfe Authentifizierung...');
+    const testAuth = await authManager.extractAuthData(currentWorkProfile.personioInstance);
+
+    if (!testAuth || !testAuth.xsrfToken) {
+      throw new Error('Authentifizierung fehlgeschlagen. Bitte bei Personio einloggen.');
+    }
+
+    addImportProgressLog('✅ Authentifizierung OK');
+
+    // Initialize services
+    const apiClient = new PersonioAPIClient(currentWorkProfile.personioInstance, authManager);
+    const timesheetService = new TimesheetService(apiClient);
+    const attendanceService = new AttendanceService(apiClient, timesheetService);
+
+    addImportProgressLog('📅 Rufe Timesheet ab...');
+
+    // Fetch timesheet for the date range
+    const timesheet = await timesheetService.getCurrentMonthTimesheet(
+      currentWorkProfile.employeeId,
+      currentWorkProfile.timezone
+    );
+
+    addImportProgressLog(`✅ Timesheet abgerufen: ${timesheet.timecards.length} Tage gefunden`);
+
+    // Match import data with timesheet
+    const recordableDays = timeImportService.matchWithTimesheet(importedData, timesheet);
+
+    if (recordableDays.length === 0) {
+      addImportProgressLog('ℹ️ Keine Tage zum Eintragen gefunden (alle bereits eingetragen oder nicht trackbar)');
+      showImportResults({
+        total: 0,
+        successful: 0,
+        failed: 0,
+        details: []
+      });
+      return;
+    }
+
+    addImportProgressLog(`📝 ${recordableDays.length} Tage zum Eintragen gefunden`);
+
+    // Record attendance from import
+    const results = await attendanceService.recordMultipleDays(
+      recordableDays,
+      currentWorkProfile.employeeId,
+      null, // No profile schedule needed for import
+      updateImportProgress
+    );
+
+    // Show results
+    showImportResults(results);
+
+    // Save last sync timestamp
+    await storageManager.saveLastSync(Date.now());
+
+  } catch (error) {
+    console.error('Import failed:', error);
+    addImportProgressLog(`❌ Fehler: ${error.message}`, true);
+    alert('Fehler beim Import:\n\n' + error.message);
+  } finally {
+    startBtn.disabled = false;
+    startBtn.textContent = 'Import starten';
+  }
+}
+
 // Update progress display
 function updateProgress(current, total, date, success) {
   const percentage = (current / total) * 100;
@@ -401,9 +572,29 @@ function updateProgress(current, total, date, success) {
   addProgressLog(`${status} ${date}`, !success);
 }
 
+// Update import progress display
+function updateImportProgress(current, total, date, success) {
+  const percentage = (current / total) * 100;
+  document.getElementById('importProgressFill').style.width = percentage + '%';
+  document.getElementById('importProgressText').textContent = `${current} / ${total}`;
+
+  const status = success ? '✅' : '❌';
+  addImportProgressLog(`${status} ${date}`, !success);
+}
+
 // Add entry to progress log
 function addProgressLog(message, isError = false) {
   const log = document.getElementById('progressLog');
+  const entry = document.createElement('div');
+  entry.className = 'progress-log-entry' + (isError ? ' error' : ' success');
+  entry.textContent = message;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+// Add entry to import progress log
+function addImportProgressLog(message, isError = false) {
+  const log = document.getElementById('importProgressLog');
   const entry = document.createElement('div');
   entry.className = 'progress-log-entry' + (isError ? ' error' : ' success');
   entry.textContent = message;
@@ -425,6 +616,35 @@ function showResults(results) {
   summary.innerHTML = `
     <h4>${results.successful} / ${results.total} erfolgreich</h4>
     <p>${results.failed > 0 ? `${results.failed} fehlgeschlagen` : 'Alle Tage erfolgreich eingetragen!'}</p>
+  `;
+
+  // Show details
+  details.innerHTML = '';
+  results.details.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'result-item' + (item.success ? '' : ' error');
+    div.innerHTML = `
+      <div class="result-item-date">${item.success ? '✅' : '❌'} ${item.date}</div>
+      <div class="result-item-message">${item.success ? item.message : item.error}</div>
+    `;
+    details.appendChild(div);
+  });
+}
+
+// Show import results
+function showImportResults(results) {
+  document.getElementById('importProgressSection').style.display = 'none';
+  document.getElementById('importResultSection').style.display = 'block';
+
+  const summary = document.getElementById('importResultSummary');
+  const details = document.getElementById('importResultDetails');
+
+  const hasErrors = results.failed > 0;
+  summary.className = 'result-summary' + (hasErrors ? ' has-errors' : '');
+
+  summary.innerHTML = `
+    <h4>${results.successful} / ${results.total} erfolgreich</h4>
+    <p>${results.failed > 0 ? `${results.failed} fehlgeschlagen` : 'Alle Tage erfolgreich importiert!'}</p>
   `;
 
   // Show details
