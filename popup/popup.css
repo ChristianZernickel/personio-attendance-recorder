@@ -533,21 +533,158 @@ section h3 {
   color: #6b7280;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+.tab-btn {
+  flex: 1;
+  padding: 10px 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -2px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #c7c7c7;
-  border-radius: 3px;
+.tab-btn:hover {
+  color: #667eea;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+.tab-btn.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Import Section */
+.import-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.import-description {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 15px;
+  line-height: 1.6;
+}
+
+.file-name {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 13px;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.import-preview {
+  margin: 15px 0;
+  animation: slideIn 0.3s ease;
+}
+
+.import-details {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.import-detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 13px;
+}
+
+.import-detail-row:last-child {
+  border-bottom: none;
+}
+
+.import-detail-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.import-detail-value {
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.import-dates {
+  margin-top: 10px;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.import-dates-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.import-dates-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.import-date-tag {
+  display: inline-block;
+  padding: 4px 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: #1e40af;
+  font-weight: 600;
+}
+
+.info-box.error {
+  background: #fef2f2;
+  border-color: #fca5a5;
+}
+
+.info-box.error p {
+  color: #991b1b;
+  white-space: pre-wrap;
 }
 

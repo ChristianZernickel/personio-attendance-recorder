@@ -1,0 +1,69 @@
+[
+  {
+    "id": 1,
+    "start": "20251114T070800Z",
+    "end": "20251114T090000Z",
+    "tags": ["morning-session", "project-alpha"]
+  },
+  {
+    "id": 2,
+    "start": "20251114T090030Z",
+    "end": "20251114T093000Z",
+    "tags": ["meeting", "daily-standup"]
+  },
+  {
+    "id": 3,
+    "start": "20251114T093015Z",
+    "end": "20251114T113000Z",
+    "tags": ["deep-work", "coding"]
+  },
+  {
+    "id": 4,
+    "start": "20251114T113000Z",
+    "end": "20251114T113500Z",
+    "tags": ["short-break"]
+  },
+  {
+    "id": 5,
+    "start": "20251114T113500Z",
+    "end": "20251114T120000Z",
+    "tags": ["code-review"]
+  },
+  {
+    "id": 6,
+    "start": "20251114T120000Z",
+    "end": "20251114T130000Z",
+    "tags": ["lunch-break"]
+  },
+  {
+    "id": 7,
+    "start": "20251114T130000Z",
+    "end": "20251114T143000Z",
+    "tags": ["project-beta", "implementation"]
+  },
+  {
+    "id": 8,
+    "start": "20251114T143045Z",
+    "end": "20251114T150000Z",
+    "tags": ["documentation"]
+  },
+  {
+    "id": 9,
+    "start": "20251114T150000Z",
+    "end": "20251114T153000Z",
+    "tags": ["team-meeting"]
+  },
+  {
+    "id": 10,
+    "start": "20251114T153030Z",
+    "end": "20251114T160000Z",
+    "tags": ["email", "admin"]
+  },
+  {
+    "id": 11,
+    "start": "20251114T160000Z",
+    "end": "20251114T163000Z",
+    "tags": ["wrap-up", "planning"]
+  }
+]
+
