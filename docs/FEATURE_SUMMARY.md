@@ -1,6 +1,10 @@
 # 📋 Feature Zusammenfassung
 
-## Implementierte Features (Stand: 2025-11-14)
+## Implementierte Features - Version 0.2.0 (Stand: 2025-11-14)
+
+**Release:** v0.2.0 - Time Import Feature  
+**Datum:** 14. November 2025  
+**Status:** ✅ Production Ready
 
 ### ✅ 1. Profil-basierte Zeiterfassung
 
@@ -118,16 +122,24 @@ docs/
 
 ### 🎯 Nächste mögliche Erweiterungen
 
+#### Geplant für v0.3.0
 - [ ] Import von CSV-Dateien
 - [ ] Export der eingetragenen Zeiten
+- [ ] Import-Historie mit Rollback
+- [ ] Vorschau vor dem Import mit Editierung
+
+#### Ideen für später
 - [ ] Batch-Import für mehrere Monate
-- [ ] Vorschau vor dem Import
-- [ ] Manuelle Bearbeitung einzelner Tage
-- [ ] Import-Historie
+- [ ] Manuelle Bearbeitung einzelner Tage im Plugin
 - [ ] Automatischer Import bei bestimmten Events
+- [ ] Synchronisation mit anderen Tools (Toggl, Clockify, etc.)
+- [ ] Statistiken & Reports
+- [ ] Notifications bei erfolgreichem Import
 
 ---
 
-**Version:** 0.1.0  
+**Version:** 0.2.0 - Time Import Feature  
+**Release Datum:** 14. November 2025  
+**Status:** ✅ Production Ready  
 **Letztes Update:** 2025-11-14
 
