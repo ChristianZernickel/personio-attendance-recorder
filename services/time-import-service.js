@@ -6,6 +6,79 @@ class TimeImportService {
   }
 
   /**
+   * Parse import data from JSON array
+   * @param {Array} data - JSON array of time entries
+   * @returns {Object} - Parsed data with summary
+   */
+  parseImportData(data) {
+    try {
+      if (!Array.isArray(data)) {
+        throw new Error('JSON muss ein Array sein');
+      }
+
+      if (data.length === 0) {
+        throw new Error('Keine Einträge in der Datei gefunden');
+      }
+
+      // Validate and parse entries
+      const validEntries = [];
+      const errors = [];
+
+      for (let i = 0; i < data.length; i++) {
+        const entry = data[i];
+
+        if (!entry.start || !entry.end) {
+          errors.push(`Eintrag ${i + 1}: 'start' und 'end' sind erforderlich`);
+          continue;
+        }
+
+        try {
+          const startDate = this._parseISOTimestamp(entry.start);
+          const endDate = this._parseISOTimestamp(entry.end);
+
+          if (endDate <= startDate) {
+            errors.push(`Eintrag ${i + 1}: 'end' muss nach 'start' liegen`);
+            continue;
+          }
+
+          validEntries.push({
+            start: startDate,
+            end: endDate,
+            originalStart: entry.start,
+            originalEnd: entry.end
+          });
+        } catch (error) {
+          errors.push(`Eintrag ${i + 1}: Ungültiges Zeitformat - ${error.message}`);
+        }
+      }
+
+      if (validEntries.length === 0) {
+        throw new Error('Keine gültigen Einträge gefunden:\n' + errors.join('\n'));
+      }
+
+      this.entries = validEntries;
+      this._groupByDate();
+
+      const dateRange = this._getDateRange();
+      const dates = this.getImportableDates();
+
+      return {
+        totalDays: dates.length,
+        totalEntries: validEntries.length,
+        dateRange: {
+          start: dateRange.startDate,
+          end: dateRange.endDate
+        },
+        dates: dates,
+        errors: errors
+      };
+
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
    * Parse and validate JSON file
    * @param {File} file - The uploaded JSON file
    * @returns {Promise<Object>} - Validation result with entries
@@ -174,10 +247,12 @@ class TimeImportService {
 
       // Add work period
       periods.push({
+        attendance_period_id: this._generateUUID(),
         start: startLocal,
         end: endLocal,
         period_type: 'work',
-        attendance_period_id: this._generateUUID()
+        comment: null,
+        project_id: null
       });
 
       // Check for break between this and next entry
@@ -190,10 +265,12 @@ class TimeImportService {
           const breakEndLocal = this._convertToTimezone(nextEntry.start, timezone);
 
           periods.push({
+            attendance_period_id: this._generateUUID(),
             start: breakStartLocal,
             end: breakEndLocal,
             period_type: 'break',
-            attendance_period_id: this._generateUUID()
+            comment: null,
+            project_id: null
           });
         }
       }
@@ -285,11 +362,72 @@ class TimeImportService {
   }
 
   /**
+   * Match import data with timesheet and return recordable days
+   * @param {Object} importData - Parsed import data from parseImportData
+   * @param {Object} timesheet - Timesheet response from API
+   * @returns {Array} - Array of recordable day objects with periods
+   */
+  matchWithTimesheet(importData, timesheet) {
+    const recordableDays = [];
+    const dates = this.getImportableDates();
+
+    for (const dateStr of dates) {
+      // Find matching timecard
+      const timecard = timesheet.timecards.find(card => card.date === dateStr);
+
+      if (!timecard) {
+        console.log(`⚠️ ${dateStr}: Nicht im Timesheet gefunden`);
+        continue;
+      }
+
+      // Check if day is trackable
+      if (timecard.state !== 'trackable') {
+        console.log(`⚠️ ${dateStr}: Nicht trackbar (${timecard.state})`);
+        continue;
+      }
+
+      // Check if it's an off-day
+      if (timecard.is_off_day) {
+        console.log(`⚠️ ${dateStr}: Off-Day`);
+        continue;
+      }
+
+      // Check if already has periods
+      if (timecard.periods && timecard.periods.length > 0) {
+        console.log(`⚠️ ${dateStr}: Bereits eingetragen`);
+        continue;
+      }
+
+      // Convert entries to periods
+      const periods = this.convertToPeriods(dateStr);
+
+      if (periods.length === 0) {
+        console.log(`⚠️ ${dateStr}: Keine Perioden generiert`);
+        continue;
+      }
+
+      // Add to recordable days
+      recordableDays.push({
+        date: dateStr,
+        day_id: timecard.day_id,
+        periods: periods
+      });
+    }
+
+    return recordableDays;
+  }
+
+  /**
    * Clear all loaded data
    */
   clear() {
     this.entries = [];
     this.groupedByDate = {};
   }
+}
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = TimeImportService;
 }
 
