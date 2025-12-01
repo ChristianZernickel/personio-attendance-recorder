@@ -35,8 +35,13 @@ function setupEventListeners() {
   document.getElementById('tabProfile').addEventListener('click', () => switchTab('profile'));
   document.getElementById('tabImport').addEventListener('click', () => switchTab('import'));
 
+  // Import method tabs
+  document.getElementById('importMethodFile').addEventListener('click', () => switchImportMethod('file'));
+  document.getElementById('importMethodText').addEventListener('click', () => switchImportMethod('text'));
+
   // Import events
   document.getElementById('importFile').addEventListener('change', handleFileSelect);
+  document.getElementById('parseImportText').addEventListener('click', handleParseImportText);
   document.getElementById('startImport').addEventListener('click', handleStartImport);
 }
 
@@ -49,6 +54,31 @@ function switchTab(tab) {
   // Update tab content
   document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
   document.getElementById(`${tab}Tab`).classList.add('active');
+}
+
+// Switch between import methods (file vs text)
+function switchImportMethod(method) {
+  // Update method buttons
+  document.querySelectorAll('.import-method-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(`importMethod${method.charAt(0).toUpperCase() + method.slice(1)}`).classList.add('active');
+
+  // Update method content
+  const fileMethod = document.getElementById('importFileMethod');
+  const textMethod = document.getElementById('importTextMethod');
+
+  if (method === 'file') {
+    fileMethod.style.display = 'block';
+    textMethod.style.display = 'none';
+  } else {
+    fileMethod.style.display = 'none';
+    textMethod.style.display = 'block';
+  }
+
+  // Reset import data and buttons
+  importedData = null;
+  document.getElementById('startImport').disabled = true;
+  document.getElementById('fileInfo').classList.remove('visible', 'error');
+  document.getElementById('textInfo').classList.remove('visible', 'error');
 }
 
 // Toggle profile editor visibility
@@ -452,23 +482,73 @@ async function handleFileSelect(event) {
     importedData = parsed;
 
     // Show file info
+    fileInfo.classList.add('visible');
+    fileInfo.classList.remove('error');
     fileInfo.innerHTML = `
-      <div class="info-box success">
-        <p><strong>✅ Datei geladen:</strong> ${file.name}</p>
-        <p>${parsed.totalDays} Tag(e) gefunden</p>
-        <p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>
-      </div>
+      <p><strong>✅ Datei geladen:</strong> ${file.name}</p>
+      <p>${parsed.totalDays} Tag(e) gefunden</p>
+      <p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>
     `;
 
     startImportBtn.disabled = false;
 
   } catch (error) {
     console.error('File parse error:', error);
+    fileInfo.classList.add('visible', 'error');
     fileInfo.innerHTML = `
-      <div class="info-box error">
-        <p><strong>❌ Fehler beim Lesen der Datei:</strong></p>
-        <p>${error.message}</p>
-      </div>
+      <p><strong>❌ Fehler beim Lesen der Datei:</strong></p>
+      <p>${error.message}</p>
+    `;
+    importedData = null;
+    startImportBtn.disabled = true;
+  }
+}
+
+// Handle text import parsing
+function handleParseImportText() {
+  const textArea = document.getElementById('importText');
+  const textInfo = document.getElementById('textInfo');
+  const startImportBtn = document.getElementById('startImport');
+
+  const text = textArea.value.trim();
+
+  if (!text) {
+    textInfo.classList.add('visible', 'error');
+    textInfo.innerHTML = `
+      <p><strong>❌ Keine Daten vorhanden</strong></p>
+      <p>Bitte JSON-Daten einfügen</p>
+    `;
+    importedData = null;
+    startImportBtn.disabled = true;
+    return;
+  }
+
+  try {
+    // Parse JSON
+    const data = JSON.parse(text);
+
+    // Parse the import data
+    const parsed = timeImportService.parseImportData(data);
+
+    importedData = parsed;
+
+    // Show text info
+    textInfo.classList.add('visible');
+    textInfo.classList.remove('error');
+    textInfo.innerHTML = `
+      <p><strong>✅ JSON erfolgreich geparst</strong></p>
+      <p>${parsed.totalDays} Tag(e) gefunden</p>
+      <p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>
+    `;
+
+    startImportBtn.disabled = false;
+
+  } catch (error) {
+    console.error('❌ Fehler beim Parsen der Daten:', error);
+    textInfo.classList.add('visible', 'error');
+    textInfo.innerHTML = `
+      <p><strong>❌ Fehler beim Parsen:</strong></p>
+      <p>${error.message}</p>
     `;
     importedData = null;
     startImportBtn.disabled = true;

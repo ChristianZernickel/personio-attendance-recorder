@@ -599,92 +599,81 @@ section h3 {
   font-size: 13px;
   color: #6b7280;
   margin-bottom: 15px;
-  line-height: 1.6;
 }
 
-.file-name {
-  display: inline-block;
-  margin-left: 10px;
-  font-size: 13px;
-  color: #667eea;
-  font-weight: 500;
-}
-
-.import-preview {
-  margin: 15px 0;
-  animation: slideIn 0.3s ease;
-}
-
-.import-details {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 10px;
-}
-
-.import-detail-row {
+/* Import Method Tabs */
+.import-method-tabs {
   display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  border-bottom: 1px solid #e5e7eb;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.import-method-btn {
+  flex: 1;
+  padding: 8px 12px;
+  background: #f3f4f6;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
   font-size: 13px;
-}
-
-.import-detail-row:last-child {
-  border-bottom: none;
-}
-
-.import-detail-label {
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.import-detail-value {
-  color: #1f2937;
   font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.import-dates {
+.import-method-btn:hover {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.import-method-btn.active {
+  background: #667eea;
+  border-color: #667eea;
+  color: white;
+}
+
+.import-method-content {
+  margin-bottom: 15px;
+}
+
+/* Import Textarea */
+.import-textarea {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.import-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.import-textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* File Info */
+#fileInfo, #textInfo {
   margin-top: 10px;
   padding: 10px;
-  background: white;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  display: none;
 }
 
-.import-dates-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  margin-bottom: 6px;
+#fileInfo.visible, #textInfo.visible {
   display: block;
 }
 
-.import-dates-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.import-date-tag {
-  display: inline-block;
-  padding: 4px 8px;
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 4px;
-  font-size: 11px;
-  font-family: 'Courier New', monospace;
-  color: #1e40af;
-  font-weight: 600;
-}
-
-.info-box.error {
+#fileInfo.error, #textInfo.error {
   background: #fef2f2;
   border-color: #fca5a5;
-}
-
-.info-box.error p {
   color: #991b1b;
-  white-space: pre-wrap;
 }
-

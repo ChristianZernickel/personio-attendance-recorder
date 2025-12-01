@@ -245,14 +245,36 @@
             Bereits eingetragene Tage werden automatisch übersprungen.
           </p>
 
-          <div class="form-group">
-            <label for="importFile" class="btn btn-secondary">
-              📁 Datei auswählen...
-            </label>
-            <input type="file" id="importFile" accept=".json,application/json" style="display: none;">
+          <!-- Import Method Selection -->
+          <div class="import-method-tabs">
+            <button id="importMethodFile" class="import-method-btn active">📁 Datei</button>
+            <button id="importMethodText" class="import-method-btn">📝 Text</button>
           </div>
 
-          <div id="fileInfo"></div>
+          <!-- File Import -->
+          <div id="importFileMethod" class="import-method-content">
+            <div class="form-group">
+              <label for="importFile" class="btn btn-secondary">
+                📁 Datei auswählen...
+              </label>
+              <input type="file" id="importFile" accept=".json,application/json" style="display: none;">
+            </div>
+            <div id="fileInfo"></div>
+          </div>
+
+          <!-- Text Import -->
+          <div id="importTextMethod" class="import-method-content" style="display: none;">
+            <div class="form-group">
+              <label for="importText">JSON einfügen:</label>
+              <textarea id="importText"
+                        class="import-textarea"
+                        placeholder='[{"id":1,"start":"20251114T080000Z","end":"20251114T120000Z","tags":["work"]},...]'
+                        rows="10"></textarea>
+              <small>Fügen Sie hier Ihre JSON-Daten ein</small>
+            </div>
+            <button id="parseImportText" class="btn btn-secondary">JSON validieren</button>
+            <div id="textInfo"></div>
+          </div>
 
           <button id="startImport" class="btn btn-primary btn-large" disabled>
             Zeiten importieren

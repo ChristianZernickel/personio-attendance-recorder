@@ -33,15 +33,27 @@ Erstelle eine JSON-Datei mit diesem Format:
 
 ### 2. Import durchführen
 
+#### Option A: Datei hochladen
+
 1. **Öffne das Plugin** auf einer Personio-Seite
 2. **Wechsle zum "Import" Tab**
-3. **Wähle deine JSON-Datei**
-4. **Prüfe die Vorschau** - zeigt:
+3. **Wähle "📁 Datei"** als Import-Methode
+4. **Wähle deine JSON-Datei**
+5. **Prüfe die Vorschau** - zeigt:
    - Anzahl der Einträge
    - Gefundene Tage
    - Zeitraum
-   - Gesamtarbeitszeit
-5. **Klicke auf "Zeiten importieren"**
+6. **Klicke auf "Zeiten importieren"**
+
+#### Option B: Text einfügen (NEU ✨)
+
+1. **Öffne das Plugin** auf einer Personio-Seite
+2. **Wechsle zum "Import" Tab**
+3. **Wähle "📝 Text"** als Import-Methode
+4. **Füge deine JSON-Daten ein** (Copy & Paste)
+5. **Klicke auf "JSON validieren"**
+6. **Prüfe die Vorschau**
+7. **Klicke auf "Zeiten importieren"**
 
 ### 3. Was passiert beim Import?
 
