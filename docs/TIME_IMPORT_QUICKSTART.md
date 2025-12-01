@@ -35,14 +35,14 @@ Erstelle eine JSON-Datei mit diesem Format:
 
 #### Option A: Datei hochladen
 
-1. **Öffne das Plugin** auf einer Personio-Seite
-2. **Wechsle zum "Import" Tab**
+3. **Wähle deine JSON-Datei**
+4. **Prüfe die Vorschau** - zeigt:
 3. **Wähle "📁 Datei"** als Import-Methode
 4. **Wähle deine JSON-Datei**
 5. **Prüfe die Vorschau** - zeigt:
-   - Anzahl der Einträge
-   - Gefundene Tage
-   - Zeitraum
+   - Gesamtarbeitszeit
+5. **Klicke auf "Zeiten importieren"**
+
 6. **Klicke auf "Zeiten importieren"**
 
 #### Option B: Text einfügen (NEU ✨)
@@ -54,18 +54,6 @@ Erstelle eine JSON-Datei mit diesem Format:
 5. **Klicke auf "JSON validieren"**
 6. **Prüfe die Vorschau**
 7. **Klicke auf "Zeiten importieren"**
-
-### 3. Was passiert beim Import?
-
-1. ✅ System lädt Timesheet für den Zeitraum
-2. ✅ Filtert bereits eingetragene Tage (werden übersprungen!)
-3. ✅ Konvertiert UTC → deine Zeitzone (z.B. Europe/Berlin)
-4. ✅ Erkennt Pausen automatisch (Lücken zwischen Einträgen)
-5. ✅ Trägt jeden Tag in Personio ein
-
-## Pause-Erkennung
-
-### Automatische Pausen
 
 Lücken zwischen Einträgen werden als Pausen erkannt:
 

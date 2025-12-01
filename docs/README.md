@@ -4,9 +4,9 @@
 
 Das Personio Attendance Recorder Chrome Plugin ermöglicht die automatisierte Zeiterfassung in Personio mit zwei Modi:
 1. **Profil-basiert**: Automatische Eintragung basierend auf Arbeitszeitprofil
-2. **JSON-Import**: Import von Arbeitszeiten aus JSON-Dateien
+2. **JSON-Import**: Import von Arbeitszeiten aus JSON-Dateien (mit Multi-Month Support)
 
-**Aktuelle Version:** v0.2.0 (November 2025)
+**Aktuelle Version:** v0.2.1 (Dezember 2025)
 
 ## Dokumentationsstruktur
 
@@ -14,11 +14,12 @@ Das Personio Attendance Recorder Chrome Plugin ermöglicht die automatisierte Ze
 - **[✅ Test Checklist](./TEST_CHECKLIST.md)** - Komplette Test-Checkliste für alle Features
 - **[🚀 Time Import Quick Start](./TIME_IMPORT_QUICKSTART.md)** - Schnelleinstieg für JSON-Import
 
-### 📋 Features (v0.2.0)
+### 📋 Features (v0.2.1)
 - **[📋 Feature Summary](./FEATURE_SUMMARY.md)** - Übersicht aller implementierten Features
 - **[📅 Per-Day Schedule](./PER_DAY_SCHEDULE_FEATURE.md)** - Flexible Arbeitszeiten pro Wochentag
 - **[📥 Time Import Feature](./TIME_IMPORT_FEATURE.md)** - Import von Arbeitszeiten aus JSON-Dateien
 - **[🔧 Time Import Implementation](./TIME_IMPORT_IMPLEMENTATION.md)** - Technische Implementierungsdetails
+- **[📆 Multi-Month Import](./MULTI_MONTH_IMPORT.md)** - Import von Daten aus mehreren Monaten (NEU in v0.2.1)
 
 ### 📚 Core Dokumentation
 - **[Knowledge Base](./knowledge-base.md)** - Technische Dokumentation, API-Details und Implementierungswissen
