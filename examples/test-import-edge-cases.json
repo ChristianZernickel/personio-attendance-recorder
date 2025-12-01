@@ -1,0 +1,81 @@
+[
+  {
+    "id": 1,
+    "start": "20251114T060000Z",
+    "end": "20251114T063000Z",
+    "tags": ["edge-case-very-early-start"]
+  },
+  {
+    "id": 2,
+    "start": "20251114T063015Z",
+    "end": "20251114T090000Z",
+    "tags": ["gap-15-seconds-should-merge"]
+  },
+  {
+    "id": 3,
+    "start": "20251114T090030Z",
+    "end": "20251114T093000Z",
+    "tags": ["gap-30-seconds-should-merge"]
+  },
+  {
+    "id": 4,
+    "start": "20251114T093100Z",
+    "end": "20251114T120000Z",
+    "tags": ["gap-1-minute-should-be-break"]
+  },
+  {
+    "id": 5,
+    "start": "20251114T120000Z",
+    "end": "20251114T120200Z",
+    "tags": ["very-short-2-minute-session"]
+  },
+  {
+    "id": 6,
+    "start": "20251114T120500Z",
+    "end": "20251114T130000Z",
+    "tags": ["lunch-with-3-minute-gap-before"]
+  },
+  {
+    "id": 7,
+    "start": "20251114T130000Z",
+    "end": "20251114T150000Z",
+    "tags": ["long-2-hour-session"]
+  },
+  {
+    "id": 8,
+    "start": "20251114T150500Z",
+    "end": "20251114T153000Z",
+    "tags": ["gap-5-minutes"]
+  },
+  {
+    "id": 9,
+    "start": "20251114T153045Z",
+    "end": "20251114T160000Z",
+    "tags": ["gap-45-seconds"]
+  },
+  {
+    "id": 10,
+    "start": "20251114T160010Z",
+    "end": "20251114T163000Z",
+    "tags": ["gap-10-seconds"]
+  },
+  {
+    "id": 11,
+    "start": "20251114T163000Z",
+    "end": "20251114T170000Z",
+    "tags": ["no-gap-direct-continuation"]
+  },
+  {
+    "id": 12,
+    "start": "20251114T171500Z",
+    "end": "20251114T173000Z",
+    "tags": ["late-evening-session-15-minute-gap"]
+  },
+  {
+    "id": 13,
+    "start": "20251114T180000Z",
+    "end": "20251114T183000Z",
+    "tags": ["very-late-session-30-minute-gap"]
+  }
+]
+

@@ -1,0 +1,165 @@
+[
+  {
+    "id": 1,
+    "start": "20251111T070000Z",
+    "end": "20251111T120000Z",
+    "tags": ["monday-morning"]
+  },
+  {
+    "id": 2,
+    "start": "20251111T120000Z",
+    "end": "20251111T130000Z",
+    "tags": ["lunch"]
+  },
+  {
+    "id": 3,
+    "start": "20251111T130000Z",
+    "end": "20251111T160000Z",
+    "tags": ["monday-afternoon"]
+  },
+  {
+    "id": 4,
+    "start": "20251112T065000Z",
+    "end": "20251112T090000Z",
+    "tags": ["tuesday-early-start"]
+  },
+  {
+    "id": 5,
+    "start": "20251112T090030Z",
+    "end": "20251112T120000Z",
+    "tags": ["tuesday-morning"]
+  },
+  {
+    "id": 6,
+    "start": "20251112T123000Z",
+    "end": "20251112T170000Z",
+    "tags": ["tuesday-afternoon", "long-session"]
+  },
+  {
+    "id": 7,
+    "start": "20251113T075824Z",
+    "end": "20251113T080900Z",
+    "tags": ["hrvst:2795306542"]
+  },
+  {
+    "id": 8,
+    "start": "20251113T080900Z",
+    "end": "20251113T081342Z",
+    "tags": ["hrvst:2795311414", "kloudease daily", "prj-kloudease-agile-ceremonies"]
+  },
+  {
+    "id": 9,
+    "start": "20251113T081342Z",
+    "end": "20251113T091821Z",
+    "tags": ["hrvst:2795306542"]
+  },
+  {
+    "id": 10,
+    "start": "20251113T092139Z",
+    "end": "20251113T101510Z",
+    "tags": ["aoe-team-ai", "hrvst:2795347647", "kloudease cluster", "prj-ai-platform-modules"]
+  },
+  {
+    "id": 11,
+    "start": "20251113T122420Z",
+    "end": "20251113T122719Z",
+    "tags": ["aoe-team-ai", "hrvst:2795347647", "kloudease cluster", "prj-ai-platform-modules"]
+  },
+  {
+    "id": 12,
+    "start": "20251113T122719Z",
+    "end": "20251113T125751Z",
+    "tags": ["aoe-team-ai", "cluster bootstrap module rework", "hrvst:2795432632", "prj-ai-platform-modules"]
+  },
+  {
+    "id": 13,
+    "start": "20251113T130000Z",
+    "end": "20251113T160000Z",
+    "tags": ["afternoon-work"]
+  },
+  {
+    "id": 14,
+    "start": "20251114T070800Z",
+    "end": "20251114T090000Z",
+    "tags": ["morning-session", "project-alpha"]
+  },
+  {
+    "id": 15,
+    "start": "20251114T090030Z",
+    "end": "20251114T093000Z",
+    "tags": ["meeting", "daily-standup"]
+  },
+  {
+    "id": 16,
+    "start": "20251114T093015Z",
+    "end": "20251114T113000Z",
+    "tags": ["deep-work", "coding"]
+  },
+  {
+    "id": 17,
+    "start": "20251114T113000Z",
+    "end": "20251114T113500Z",
+    "tags": ["short-break"]
+  },
+  {
+    "id": 18,
+    "start": "20251114T113500Z",
+    "end": "20251114T120000Z",
+    "tags": ["code-review"]
+  },
+  {
+    "id": 19,
+    "start": "20251114T120000Z",
+    "end": "20251114T130000Z",
+    "tags": ["lunch-break"]
+  },
+  {
+    "id": 20,
+    "start": "20251114T130000Z",
+    "end": "20251114T143000Z",
+    "tags": ["project-beta", "implementation"]
+  },
+  {
+    "id": 21,
+    "start": "20251114T143045Z",
+    "end": "20251114T150000Z",
+    "tags": ["documentation"]
+  },
+  {
+    "id": 22,
+    "start": "20251114T150000Z",
+    "end": "20251114T153000Z",
+    "tags": ["team-meeting"]
+  },
+  {
+    "id": 23,
+    "start": "20251114T153030Z",
+    "end": "20251114T160000Z",
+    "tags": ["email", "admin"]
+  },
+  {
+    "id": 24,
+    "start": "20251114T160000Z",
+    "end": "20251114T163000Z",
+    "tags": ["wrap-up", "planning"]
+  },
+  {
+    "id": 25,
+    "start": "20251115T080000Z",
+    "end": "20251115T120000Z",
+    "tags": ["friday-morning"]
+  },
+  {
+    "id": 26,
+    "start": "20251115T120000Z",
+    "end": "20251115T123000Z",
+    "tags": ["friday-short-lunch"]
+  },
+  {
+    "id": 27,
+    "start": "20251115T123000Z",
+    "end": "20251115T133000Z",
+    "tags": ["friday-afternoon"]
+  }
+]
+

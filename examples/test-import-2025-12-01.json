@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "start": "20251201T070000Z",
+    "end": "20251201T080000Z",
+    "tags": ["early-start", "preparation"]
+  },
+  {
+    "id": 2,
+    "start": "20251201T080000Z",
+    "end": "20251201T090000Z",
+    "tags": ["meeting", "daily-standup"]
+  },
+  {
+    "id": 3,
+    "start": "20251201T090000Z",
+    "end": "20251201T120000Z",
+    "tags": ["development", "feature-implementation"]
+  },
+  {
+    "id": 4,
+    "start": "20251201T120000Z",
+    "end": "20251201T123000Z",
+    "tags": ["lunch-break"]
+  },
+  {
+    "id": 5,
+    "start": "20251201T123000Z",
+    "end": "20251201T150000Z",
+    "tags": ["development", "code-review"]
+  },
+  {
+    "id": 6,
+    "start": "20251201T150000Z",
+    "end": "20251201T151500Z",
+    "tags": ["coffee-break"]
+  },
+  {
+    "id": 7,
+    "start": "20251201T151500Z",
+    "end": "20251201T170000Z",
+    "tags": ["testing", "documentation"]
+  }
+]
+

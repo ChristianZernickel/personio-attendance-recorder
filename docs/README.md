@@ -2,31 +2,61 @@
 
 ## Übersicht
 
-Das Personio Attendance Recorder Chrome Plugin ermöglicht die automatisierte Zeiterfassung in Personio basierend auf einem vordefinierten Arbeitszeitprofil.
+Das Personio Attendance Recorder Chrome Plugin ermöglicht die automatisierte Zeiterfassung in Personio mit zwei Modi:
+1. **Profil-basiert**: Automatische Eintragung basierend auf Arbeitszeitprofil
+2. **JSON-Import**: Import von Arbeitszeiten aus JSON-Dateien (mit Multi-Month Support)
+
+**Aktuelle Version:** v0.2.1 (Dezember 2025)
 
 ## Dokumentationsstruktur
 
-- **[⚠️ Implementierungshinweise](./IMPLEMENTATION_NOTES.md)** - Wichtige Hinweise zur Authentifizierung (Vor Implementierung lesen!)
+### 🚀 Quick Start
+- **[✅ Test Checklist](./TEST_CHECKLIST.md)** - Komplette Test-Checkliste für alle Features
+- **[🚀 Time Import Quick Start](./TIME_IMPORT_QUICKSTART.md)** - Schnelleinstieg für JSON-Import
+
+### 📋 Features (v0.2.1)
+- **[📋 Feature Summary](./FEATURE_SUMMARY.md)** - Übersicht aller implementierten Features
+- **[📅 Per-Day Schedule](./PER_DAY_SCHEDULE_FEATURE.md)** - Flexible Arbeitszeiten pro Wochentag
+- **[📥 Time Import Feature](./TIME_IMPORT_FEATURE.md)** - Import von Arbeitszeiten aus JSON-Dateien
+- **[🔧 Time Import Implementation](./TIME_IMPORT_IMPLEMENTATION.md)** - Technische Implementierungsdetails
+- **[📆 Multi-Month Import](./MULTI_MONTH_IMPORT.md)** - Import von Daten aus mehreren Monaten (NEU in v0.2.1)
+
+### 📚 Core Dokumentation
 - **[Knowledge Base](./knowledge-base.md)** - Technische Dokumentation, API-Details und Implementierungswissen
 - **[Anforderungskatalog](./anforderungskatalog.md)** - Detaillierte funktionale und nicht-funktionale Anforderungen
 - **[API-Referenz](./api-reference.md)** - Personio API Endpunkte und Datenstrukturen
 - **[Architektur](./architecture.md)** - Systemarchitektur und Komponenten
 
-## Quick Start
+### 🔧 Implementation & Troubleshooting
+- **[Implementation Notes](./IMPLEMENTATION_NOTES.md)** - Allgemeine Implementierungsnotizen
+- **[Content Script Solution](./CONTENT_SCRIPT_SOLUTION.md)** - Content Script für Cookie-Access
+- **[Session Refresh Discovery](./SESSION_REFRESH_DISCOVERY.md)** - Session-Refresh Lösung
+- **[Header Name Fix](./HEADER_NAME_FIX.md)** - Header-Name Problembehebung
+- **[3-Step Process](./3_STEP_PROCESS.md)** - 3-Schritte-Prozess
 
-1. Dokumentation lesen (insbesondere Anforderungskatalog)
-2. Chrome Extension Manifest V3 Setup
-3. Authentifizierung über Cookie-Extraktion implementieren
-4. Arbeitszeitprofil-Management entwickeln
-5. Timesheet-Integration umsetzen
-6. Automatische Zeiterfassung implementieren
+## 🎯 Was ist neu in v0.2.0?
+
+### Time Import Feature
+- **JSON-Datei Import**: Importiere Arbeitszeiten aus JSON-Dateien
+- **Tab-Navigation**: Wechsle zwischen Profil-Modus und Import-Modus
+- **Intelligente Pausen**: Automatische Erkennung von Pausen aus Zeitlücken
+- **UTC Konvertierung**: Automatische Umwandlung von UTC in lokale Zeit
+- **Multi-Tag Support**: Mehrere Tage in einer Datei
+
+### Verbesserungen
+- Neue Tab-basierte UI
+- Separate Progress/Result Sections für beide Modi
+- Erweiterte Validierung & Fehlerbehandlung
+- Intelligente Perioden-Generierung
 
 ## Technologie-Stack
 
 - **Chrome Extension API** (Manifest V3)
 - **Personio API** (REST)
-- **JavaScript/TypeScript**
-- **HTML/CSS** für Popup UI
+- **JavaScript ES6+**
+- **HTML5/CSS3** für Popup UI
+- **Chrome Storage API** für Datenpersistenz
+- **Chrome Cookies API** für Authentifizierung
 
 ## Sicherheitshinweise
 
@@ -34,8 +64,20 @@ Das Personio Attendance Recorder Chrome Plugin ermöglicht die automatisierte Ze
 - Keine Speicherung von Credentials im Klartext
 - Verwendung von Chrome Storage API für sensible Daten
 - Validierung aller API-Responses
+- Content Script läuft in Page-Context für Cookie-Zugriff
 
-## Version
+## Version History
 
-**v0.1.0** - Initial Documentation
+**v0.2.0** (2025-11-14) - Time Import Feature
+- ✨ JSON-Import hinzugefügt
+- ✨ Tab-Navigation implementiert
+- ✨ Automatische Pausen-Erkennung
+- ✨ UTC → Zeitzone Konvertierung
+- 🎨 UI-Verbesserungen
+
+**v0.1.0** (2025-11-10) - Initial Release
+- ✅ Profil-basierte Zeiterfassung
+- ✅ Pro-Tag Konfiguration
+- ✅ Cookie-basierte Auth
+- ✅ Retry-Logik
 
