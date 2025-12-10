@@ -12,6 +12,12 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
   - Unterstützung für Jahreswechsel (z.B. Dezember 2025 + Januar 2026)
 
 ### Changed
+- 🔧 **Code Modularisierung**: Komplettes Refactoring der popup.js
+  - Von 574 auf 465 Zeilen reduziert (109 Zeilen redundanter Code entfernt)
+  - Alle duplizierten Funktionen entfernt
+  - Services werden konsequent verwendet
+  - Klare Code-Struktur mit kommentierten Sektionen
+  - Bessere Trennung von UI und Business-Logik
 - `handleStartImport()` in `popup/popup.js` erweitert mit Multi-Month-Logik
 - Benutzer-Feedback verbessert: Zeigt an wenn Daten aus mehreren Monaten geladen werden
 
@@ -19,9 +25,13 @@ Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert
 - 🐛 **Import am Monatsanfang**: Tage aus dem vorherigen Monat können jetzt importiert werden
   - Beispiel: Am 1. Dezember können nun Tage vom 28.-30. November importiert werden
   - Zuvor wurden diese Tage als "nicht im Timesheet gefunden" abgelehnt
+- 🐛 **Duplicate Functions**: Alle duplizierten Funktionen entfernt
+- 🐛 **Linter Errors**: Alle JavaScript Linter-Fehler behoben
 
 ### Documentation
 - Neue Dokumentation: `MULTI_MONTH_IMPORT.md` - Detaillierte Beschreibung des Features
+- Neue Dokumentation: `CODE_STRUCTURE.md` - Vollständige Architektur-Dokumentation
+- Neue Dokumentation: `REFACTORING_SUMMARY.md` - Zusammenfassung der Modularisierung
 - `README.md` aktualisiert mit Link zur neuen Dokumentation
 - Version in `manifest.json` auf 0.2.1 erhöht
 
