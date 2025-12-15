@@ -71,12 +71,24 @@ class AttendanceService {
       console.log(`\n[${i + 1}/${recordableDays.length}] Processing ${day.date}...`);
 
       try {
-        // Generate periods for this day
-        const date = new Date(day.date);
-        const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-        const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert to ISO (1=Monday, 7=Sunday)
+        let periods;
 
-        const periods = this.timesheetService.generatePeriodsForDay(day.date, workProfile, isoDayOfWeek);
+        // Check if periods are already provided (e.g., from import)
+        if (day.periods && day.periods.length > 0) {
+          // Use provided periods (Import mode)
+          periods = day.periods;
+          console.log(`📥 Using ${periods.length} imported periods`);
+        } else if (workProfile) {
+          // Generate periods from work profile (Profile mode)
+          const date = new Date(day.date);
+          const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+          const isoDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // Convert to ISO (1=Monday, 7=Sunday)
+
+          periods = this.timesheetService.generatePeriodsForDay(day.date, workProfile, isoDayOfWeek);
+          console.log(`📅 Generated ${periods.length} periods from profile`);
+        } else {
+          throw new Error('Keine Perioden vorhanden und kein Profil zum Generieren');
+        }
 
         // Record the day
         const result = await this.recordDayWithRetry(dayId, employeeId, periods);

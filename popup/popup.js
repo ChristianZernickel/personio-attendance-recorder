@@ -1,77 +1,98 @@
 // Popup Script - Main UI Logic
 let authManager;
 let storageManager;
-let currentWorkProfile = null;
+let timeImportService;
+let profileService;
+let uiLogService;
+let workflowService;
+let currentWorkProfile;
+let importedData = null;
+
+// ============================================================================
+// Initialization
+// ============================================================================
 
 // Initialize on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('🚀 Popup initialized');
 
+  // Initialize all services
   authManager = new AuthManager();
   storageManager = new StorageManager();
+  timeImportService = new TimeImportService();
+  profileService = new ProfileService(storageManager);
+  uiLogService = new UILogService();
+  workflowService = new RecordingWorkflowService(authManager, uiLogService);
 
-  await loadWorkProfile();
+  await initProfile();
   await checkAuthentication();
   setupEventListeners();
 });
 
 // Setup event listeners
 function setupEventListeners() {
-  document.getElementById('toggleProfileEdit').addEventListener('click', toggleProfileEditor);
-  document.getElementById('saveProfile').addEventListener('click', handleSaveProfile);
-  document.getElementById('cancelEdit').addEventListener('click', hideProfileEditor);
-  document.getElementById('startRecording').addEventListener('click', handleStartRecording);
+  // Profile editor
+  const toggleProfileEdit = document.getElementById('toggleProfileEdit');
+  const saveProfile = document.getElementById('saveProfile');
+  const startRecording = document.getElementById('startRecording');
+
+  if (toggleProfileEdit) toggleProfileEdit.addEventListener('click', toggleProfileEditor);
+  if (saveProfile) saveProfile.addEventListener('click', handleSaveProfile);
+  if (startRecording) startRecording.addEventListener('click', handleStartRecording);
 
   // Enable/disable day times when checkbox changes
   for (let day = 1; day <= 7; day++) {
     const checkbox = document.getElementById(`day${day}Enabled`);
     if (checkbox) {
-      checkbox.addEventListener('change', () => {
-        updateDayTimesState(day);
-      });
+      checkbox.addEventListener('change', () => updateDayTimesState(day));
     }
   }
+
+  // Tab events
+  const tabProfile = document.getElementById('tabProfile');
+  const tabImport = document.getElementById('tabImport');
+
+  if (tabProfile) tabProfile.addEventListener('click', () => switchTab('profile'));
+  if (tabImport) tabImport.addEventListener('click', () => switchTab('import'));
+
+  // Import method tabs
+  const importMethodFile = document.getElementById('importMethodFile');
+  const importMethodText = document.getElementById('importMethodText');
+
+  if (importMethodFile) importMethodFile.addEventListener('click', () => switchImportMethod('file'));
+  if (importMethodText) importMethodText.addEventListener('click', () => switchImportMethod('text'));
+
+  // Import events
+  const importFile = document.getElementById('importFile');
+  const parseImportText = document.getElementById('parseImportText');
+  const startImport = document.getElementById('startImport');
+
+  if (importFile) importFile.addEventListener('change', handleFileSelect);
+  if (parseImportText) parseImportText.addEventListener('click', handleParseImportText);
+  if (startImport) startImport.addEventListener('click', handleStartImport);
 }
 
-// Toggle profile editor visibility
-function toggleProfileEditor() {
-  const summary = document.getElementById('profileSummary');
-  const editor = document.getElementById('profileEditor');
-  const button = document.getElementById('toggleProfileEdit');
+// ============================================================================
+// Profile Management
+// ============================================================================
 
-  if (editor.style.display === 'none') {
-    summary.style.display = 'none';
-    editor.style.display = 'block';
-    button.textContent = '✖️';
-    button.title = 'Bearbeitung abbrechen';
-  } else {
-    hideProfileEditor();
-  }
-}
-
-// Hide profile editor
-function hideProfileEditor() {
-  const summary = document.getElementById('profileSummary');
-  const editor = document.getElementById('profileEditor');
-  const button = document.getElementById('toggleProfileEdit');
-
-  summary.style.display = 'block';
-  editor.style.display = 'none';
-  button.textContent = '✏️';
-  button.title = 'Profil bearbeiten';
-}
-
-// Update day times input state based on checkbox
-function updateDayTimesState(day) {
-  const checkbox = document.getElementById(`day${day}Enabled`);
-  const times = checkbox.closest('.day-schedule').querySelector('.day-times');
-
-  if (checkbox.checked) {
-    times.style.opacity = '1';
-    times.style.pointerEvents = 'auto';
-  } else {
-    times.style.opacity = '0.4';
-    times.style.pointerEvents = 'none';
+// Load work profile from storage
+async function initProfile() {
+  try {
+    const loaded = await profileService.loadProfile();
+    if (loaded) {
+      currentWorkProfile = profileService.migrateLegacyProfile(loaded);
+      profileService.populateForm(currentWorkProfile);
+      profileService.updateSummary(currentWorkProfile);
+      profileService.updateStatus(true);
+      const startBtn = document.getElementById('startRecording');
+      if (startBtn) startBtn.disabled = false;
+    } else {
+      profileService.populateDefaultSchedule();
+      profileService.updateStatus(false);
+    }
+  } catch (e) {
+    console.error('Profil Initialisierung fehlgeschlagen:', e);
   }
 }
 
@@ -87,14 +108,11 @@ async function checkAuthentication() {
   authStatusText.textContent = 'Prüfe Authentifizierung...';
 
   try {
-    // Get personio instance from profile or default
     const profile = await storageManager.loadWorkProfile();
     const personioInstance = profile?.personioInstance || 'aoe-gmbh.app.personio.com';
-
-    // Try to extract auth data
     const authData = await authManager.extractAuthData(personioInstance);
 
-    if (authData && authData.xsrfToken) {
+    if (authData?.xsrfToken) {
       authStatus.classList.remove('loading', 'error');
       authStatus.classList.add('success');
       authStatusIcon.textContent = '✅';
@@ -109,207 +127,173 @@ async function checkAuthentication() {
   }
 }
 
-// Load work profile from storage
-async function loadWorkProfile() {
-  try {
-    const profile = await storageManager.loadWorkProfile();
+// ============================================================================
+// UI State Management
+// ============================================================================
 
-    if (profile) {
-      currentWorkProfile = profile;
-      populateFormWithProfile(profile);
-      updateProfileSummary(profile);
-      updateProfileStatus(true);
-      document.getElementById('startRecording').disabled = false;
+// Switch between tabs
+function switchTab(tab) {
+  // Update tab buttons
+  for (const btn of document.querySelectorAll('.tab-btn')) {
+    btn.classList.remove('active');
+  }
+  const activeBtn = document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  // Update tab content
+  for (const content of document.querySelectorAll('.tab-content')) {
+    content.classList.remove('active');
+  }
+  const activeContent = document.getElementById(`${tab}Tab`);
+  if (activeContent) activeContent.classList.add('active');
+}
+
+// Toggle profile editor visibility
+function toggleProfileEditor() {
+  const summary = document.getElementById('profileSummary');
+  const editor = document.getElementById('profileEditor');
+  const button = document.getElementById('toggleProfileEdit');
+
+  if (editor.style.display === 'none' || !editor.style.display) {
+    summary.style.display = 'none';
+    editor.style.display = 'block';
+    button.textContent = '✖ Abbrechen';
+  } else {
+    hideProfileEditor();
+  }
+}
+
+// Hide profile editor
+function hideProfileEditor() {
+  const summary = document.getElementById('profileSummary');
+  const editor = document.getElementById('profileEditor');
+  const button = document.getElementById('toggleProfileEdit');
+
+  summary.style.display = 'block';
+  editor.style.display = 'none';
+  button.textContent = '✏️ Profil bearbeiten';
+}
+
+// Switch between import methods (file vs text)
+function switchImportMethod(method) {
+  // Update method buttons
+  document.querySelectorAll('.import-method-btn').forEach(btn => btn.classList.remove('active'));
+  const methodBtn = document.getElementById(`importMethod${method.charAt(0).toUpperCase() + method.slice(1)}`);
+  if (methodBtn) methodBtn.classList.add('active');
+
+  // Update method content
+  const fileMethod = document.getElementById('importFileMethod');
+  const textMethod = document.getElementById('importTextMethod');
+
+  if (fileMethod && textMethod) {
+    if (method === 'file') {
+      fileMethod.style.display = 'block';
+      textMethod.style.display = 'none';
     } else {
-      updateProfileStatus(false);
-      setDefaultSchedule();
+      fileMethod.style.display = 'none';
+      textMethod.style.display = 'block';
     }
-  } catch (error) {
-    console.error('Failed to load profile:', error);
-    setDefaultSchedule();
   }
+
+  // Reset import data and buttons
+  importedData = null;
+  const startImportBtn = document.getElementById('startImport');
+  const fileInfo = document.getElementById('fileInfo');
+  const textInfo = document.getElementById('textInfo');
+
+  if (startImportBtn) startImportBtn.disabled = true;
+  if (fileInfo) fileInfo.classList.remove('visible', 'error');
+  if (textInfo) textInfo.classList.remove('visible', 'error');
 }
 
-// Populate form with profile data
-function populateFormWithProfile(profile) {
-  document.getElementById('personioInstance').value = profile.personioInstance || '';
-  document.getElementById('employeeId').value = profile.employeeId || '';
-  document.getElementById('timezone').value = profile.timezone || 'Europe/Berlin';
+// Update day times state
+function updateDayTimesState(day) {
+  const checkbox = document.getElementById(`day${day}Enabled`);
+  if (!checkbox) return;
 
-  // Populate per-day schedule
-  if (profile.schedule) {
-    for (let day = 1; day <= 7; day++) {
-      const daySchedule = profile.schedule[day];
-      const checkbox = document.getElementById(`day${day}Enabled`);
+  const times = checkbox.closest('.day-schedule')?.querySelector('.day-times');
+  if (!times) return;
 
-      if (daySchedule) {
-        checkbox.checked = daySchedule.enabled;
-        document.getElementById(`day${day}WorkStart`).value = daySchedule.workStart || '08:00';
-        document.getElementById(`day${day}WorkEnd`).value = daySchedule.workEnd || '17:00';
-        document.getElementById(`day${day}BreakStart`).value = daySchedule.breakStart || '12:00';
-        document.getElementById(`day${day}BreakEnd`).value = daySchedule.breakEnd || '13:00';
-        updateDayTimesState(day);
-      }
-    }
+  if (checkbox.checked) {
+    times.style.opacity = '1';
+    times.style.pointerEvents = 'auto';
   } else {
-    // Migrate old profile format
-    setDefaultSchedule();
-    if (profile.workingDays) {
-      profile.workingDays.forEach(day => {
-        document.getElementById(`day${day}Enabled`).checked = true;
-        updateDayTimesState(day);
-      });
-    }
+    times.style.opacity = '0.4';
+    times.style.pointerEvents = 'none';
   }
 }
 
-// Update profile summary display
-function updateProfileSummary(profile) {
-  document.getElementById('summaryInstance').textContent = profile.personioInstance || '-';
-  document.getElementById('summaryEmployeeId').textContent = profile.employeeId || '-';
-
-  // Build workdays summary
-  const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-  const workdays = [];
-
-  if (profile.schedule) {
-    for (let day = 1; day <= 7; day++) {
-      if (profile.schedule[day]?.enabled) {
-        workdays.push(dayNames[day === 7 ? 0 : day]);
-      }
-    }
-  }
-
-  document.getElementById('summaryWorkdays').textContent = workdays.join(', ') || '-';
-
-  // Build schedule details
-  const scheduleContainer = document.getElementById('summarySchedule');
-  scheduleContainer.innerHTML = '';
-
-  if (profile.schedule) {
-    const fullDayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
-
-    for (let day = 1; day <= 7; day++) {
-      const daySchedule = profile.schedule[day];
-      if (daySchedule?.enabled) {
-        const dayDiv = document.createElement('div');
-        dayDiv.className = 'summary-day';
-
-        const dayName = document.createElement('span');
-        dayName.className = 'summary-day-name';
-        dayName.textContent = fullDayNames[day === 7 ? 0 : day];
-
-        const dayTimes = document.createElement('span');
-        dayTimes.className = 'summary-day-times';
-        dayTimes.textContent = `${daySchedule.workStart}-${daySchedule.workEnd} (Pause: ${daySchedule.breakStart}-${daySchedule.breakEnd})`;
-
-        dayDiv.appendChild(dayName);
-        dayDiv.appendChild(dayTimes);
-        scheduleContainer.appendChild(dayDiv);
-      }
-    }
-  }
-}
-
-// Set default schedule (Monday-Friday)
-function setDefaultSchedule() {
-  for (let day = 1; day <= 7; day++) {
-    const checkbox = document.getElementById(`day${day}Enabled`);
-    checkbox.checked = day >= 1 && day <= 5; // Monday-Friday
-
-    // Default times
-    document.getElementById(`day${day}WorkStart`).value = '08:00';
-    document.getElementById(`day${day}WorkEnd`).value = day === 5 ? '13:00' : '17:00'; // Friday shorter
-    document.getElementById(`day${day}BreakStart`).value = '12:00';
-    document.getElementById(`day${day}BreakEnd`).value = day === 5 ? '12:30' : '13:00';
-
-    updateDayTimesState(day);
-  }
-}
-
-// Update profile status display
-function updateProfileStatus(hasProfile) {
-  const statusBox = document.getElementById('profileStatus');
-
-  if (hasProfile) {
-    statusBox.className = 'info-box success';
-    statusBox.innerHTML = '<p>✅ Profil konfiguriert und bereit</p>';
-  } else {
-    statusBox.className = 'info-box';
-    statusBox.innerHTML = '<p>Bitte zuerst Profil konfigurieren und speichern.</p>';
-  }
-}
+// ============================================================================
+// Event Handlers - Profile
+// ============================================================================
 
 // Handle save profile
 async function handleSaveProfile() {
   const saveBtn = document.getElementById('saveProfile');
+  if (!saveBtn) return;
+
   saveBtn.disabled = true;
   saveBtn.textContent = 'Speichern...';
 
   try {
-    // Collect form data with per-day schedule
+    // Collect schedule data from form
     const schedule = {};
     const workingDays = [];
 
     for (let day = 1; day <= 7; day++) {
-      const enabled = document.getElementById(`day${day}Enabled`).checked;
-
-      if (enabled) {
-        workingDays.push(day);
-      }
+      const enabled = document.getElementById(`day${day}Enabled`)?.checked || false;
+      if (enabled) workingDays.push(day);
 
       schedule[day] = {
-        enabled: enabled,
-        workStart: document.getElementById(`day${day}WorkStart`).value,
-        workEnd: document.getElementById(`day${day}WorkEnd`).value,
-        breakStart: document.getElementById(`day${day}BreakStart`).value,
-        breakEnd: document.getElementById(`day${day}BreakEnd`).value
+        enabled,
+        workStart: document.getElementById(`day${day}WorkStart`)?.value || '08:00',
+        workEnd: document.getElementById(`day${day}WorkEnd`)?.value || '17:00',
+        breakStart: document.getElementById(`day${day}BreakStart`)?.value || '12:00',
+        breakEnd: document.getElementById(`day${day}BreakEnd`)?.value || '13:00'
       };
     }
 
+    // Build profile object
     const profile = {
-      personioInstance: document.getElementById('personioInstance').value.trim(),
-      employeeId: document.getElementById('employeeId').value.trim(),
-      timezone: document.getElementById('timezone').value,
-      schedule: schedule,
-      workingDays: workingDays // Keep for backwards compatibility
+      personioInstance: document.getElementById('personioInstance')?.value.trim() || '',
+      employeeId: document.getElementById('employeeId')?.value.trim() || '',
+      timezone: document.getElementById('timezone')?.value || 'Europe/Berlin',
+      schedule,
+      workingDays
     };
 
-    // Validate profile
-    const validation = validateWorkProfile(profile);
+    // Validate using ProfileService
+    const validation = profileService.validateProfile(profile);
     if (!validation.isValid) {
       alert('Validierungsfehler:\n\n' + validation.errors.join('\n'));
       return;
     }
 
-    // Save to storage
-    await storageManager.saveWorkProfile(profile);
+    // Save and update UI
+    await profileService.saveProfile(profile);
     currentWorkProfile = profile;
-
-    // Update UI
-    updateProfileSummary(profile);
-    updateProfileStatus(true);
+    profileService.updateSummary(profile);
+    profileService.updateStatus(true);
     hideProfileEditor();
-    document.getElementById('startRecording').disabled = false;
 
-    // Re-check authentication with new instance
+    const startBtn = document.getElementById('startRecording');
+    if (startBtn) startBtn.disabled = false;
+
     await checkAuthentication();
 
-    // Show success message
     saveBtn.textContent = '✅ Gespeichert!';
     setTimeout(() => {
-      saveBtn.textContent = 'Profil speichern';
+      if (saveBtn) saveBtn.textContent = 'Profil speichern';
     }, 2000);
-
-  } catch (error) {
-    console.error('Failed to save profile:', error);
-    alert('Fehler beim Speichern: ' + error.message);
+  } catch (err) {
+    console.error('Profil speichern fehlgeschlagen:', err);
+    alert('Fehler beim Speichern: ' + err.message);
   } finally {
     saveBtn.disabled = false;
   }
 }
 
-// Handle start recording
+// Handle start recording (Profile-based)
 async function handleStartRecording() {
   if (!currentWorkProfile) {
     alert('Bitte zuerst Profil speichern!');
@@ -317,126 +301,165 @@ async function handleStartRecording() {
   }
 
   const startBtn = document.getElementById('startRecording');
+  if (!startBtn) return;
+
   startBtn.disabled = true;
   startBtn.textContent = 'Starte...';
 
   // Hide result section, show progress
-  document.getElementById('resultSection').style.display = 'none';
-  document.getElementById('progressSection').style.display = 'block';
-  document.getElementById('progressLog').innerHTML = '';
+  const resultSection = document.getElementById('resultSection');
+  const progressSection = document.getElementById('progressSection');
+  if (resultSection) resultSection.style.display = 'none';
+  if (progressSection) progressSection.style.display = 'block';
+
+  uiLogService.clear('progressLog');
 
   try {
-    // Verify auth works (will throw if not logged in)
-    addProgressLog('🔑 Prüfe Authentifizierung...');
-    const testAuth = await authManager.extractAuthData(currentWorkProfile.personioInstance);
-
-    if (!testAuth || !testAuth.xsrfToken) {
-      throw new Error('Authentifizierung fehlgeschlagen. Bitte bei Personio einloggen.');
-    }
-
-    addProgressLog('✅ Authentifizierung OK');
-
-    // Initialize services - Pass authManager so it can get fresh cookies!
+    // Initialize services for recording
     const apiClient = new PersonioAPIClient(currentWorkProfile.personioInstance, authManager);
     const timesheetService = new TimesheetService(apiClient);
     const attendanceService = new AttendanceService(apiClient, timesheetService);
 
-    addProgressLog('📅 Rufe Timesheet ab...');
-
-    // Fetch timesheet
-    const timesheet = await timesheetService.getCurrentMonthTimesheet(
-      currentWorkProfile.employeeId,
-      currentWorkProfile.timezone
-    );
-
-    addProgressLog(`✅ Timesheet abgerufen: ${timesheet.timecards.length} Tage gefunden`);
-
-    // Get recordable days
-    const recordableDays = timesheetService.getRecordableDays(timesheet, currentWorkProfile);
-
-    if (recordableDays.length === 0) {
-      addProgressLog('ℹ️ Keine Tage zum Eintragen gefunden');
-      showResults({
-        total: 0,
-        successful: 0,
-        failed: 0,
-        details: []
-      });
-      return;
-    }
-
-    addProgressLog(`📝 ${recordableDays.length} Tage zum Eintragen gefunden`);
-
-    // Record attendance
-    const results = await attendanceService.recordMultipleDays(
-      recordableDays,
-      currentWorkProfile.employeeId,
-      currentWorkProfile,
-      updateProgress
-    );
-
-    // Show results
-    showResults(results);
-
-    // Save last sync timestamp
-    await storageManager.saveLastSync(Date.now());
-
-  } catch (error) {
-    console.error('Recording failed:', error);
-    addProgressLog(`❌ Fehler: ${error.message}`, true);
-    alert('Fehler bei der Zeiterfassung:\n\n' + error.message);
+    // Use workflow service for the recording process
+    await workflowService.recordProfileDays(currentWorkProfile, {
+      apiClient,
+      timesheetService,
+      attendanceService,
+      storageManager
+    });
+  } catch (e) {
+    uiLogService.addLog('progressLog', `❌ Fehler: ${e.message}`, true);
+    alert('Fehler bei der Zeiterfassung:\n\n' + e.message);
   } finally {
     startBtn.disabled = false;
     startBtn.textContent = 'Zeiterfassung starten';
   }
 }
 
-// Update progress display
-function updateProgress(current, total, date, success) {
-  const percentage = (current / total) * 100;
-  document.getElementById('progressFill').style.width = percentage + '%';
-  document.getElementById('progressText').textContent = `${current} / ${total}`;
+// ============================================================================
+// Event Handlers - Import
+// ============================================================================
 
-  const status = success ? '✅' : '❌';
-  addProgressLog(`${status} ${date}`, !success);
-}
+// Handle file selection for import
+function handleFileSelect(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
 
-// Add entry to progress log
-function addProgressLog(message, isError = false) {
-  const log = document.getElementById('progressLog');
-  const entry = document.createElement('div');
-  entry.className = 'progress-log-entry' + (isError ? ' error' : ' success');
-  entry.textContent = message;
-  log.appendChild(entry);
-  log.scrollTop = log.scrollHeight;
-}
+  const fileInfo = document.getElementById('fileInfo');
+  const startImportBtn = document.getElementById('startImport');
 
-// Show results
-function showResults(results) {
-  document.getElementById('progressSection').style.display = 'none';
-  document.getElementById('resultSection').style.display = 'block';
+  file.text().then(text => {
+    try {
+      const data = JSON.parse(text);
+      const parsed = timeImportService.parseImportData(data);
 
-  const summary = document.getElementById('resultSummary');
-  const details = document.getElementById('resultDetails');
+      importedData = parsed;
 
-  const hasErrors = results.failed > 0;
-  summary.className = 'result-summary' + (hasErrors ? ' has-errors' : '');
-
-  summary.innerHTML = `
-    <h4>${results.successful} / ${results.total} erfolgreich</h4>
-    <p>${results.failed > 0 ? `${results.failed} fehlgeschlagen` : 'Alle Tage erfolgreich eingetragen!'}</p>
-  `;
-
-  // Show details
-  details.innerHTML = '';
-  results.details.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'result-item' + (item.success ? '' : ' error');
-    div.innerHTML = `
-      <div class="result-item-date">${item.success ? '✅' : '❌'} ${item.date}</div>
-      <div class="result-item-message">${item.success ? item.message : item.error}</div>
-    `;
-    details.appendChild(div);
+      if (fileInfo) {
+        fileInfo.classList.add('visible');
+        fileInfo.classList.remove('error');
+        fileInfo.innerHTML = `<p><strong>✅ Datei geladen:</strong> ${file.name}</p><p>${parsed.totalDays} Tag(e) gefunden</p><p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>`;
+      }
+      if (startImportBtn) startImportBtn.disabled = false;
+    } catch (err) {
+      if (fileInfo) {
+        fileInfo.classList.add('visible', 'error');
+        fileInfo.innerHTML = `<p><strong>❌ Fehler beim Lesen:</strong></p><p>${err.message}</p>`;
+      }
+      importedData = null;
+      if (startImportBtn) startImportBtn.disabled = true;
+    }
+  }).catch(err => {
+    if (fileInfo) {
+      fileInfo.classList.add('visible', 'error');
+      fileInfo.innerHTML = `<p><strong>❌ Fehler beim Lesen der Datei:</strong></p><p>${err.message}</p>`;
+    }
+    importedData = null;
+    if (startImportBtn) startImportBtn.disabled = true;
   });
+}
+
+// Handle text import parsing
+function handleParseImportText() {
+  const textArea = document.getElementById('importText');
+  const textInfo = document.getElementById('textInfo');
+  const startImportBtn = document.getElementById('startImport');
+
+  if (!textArea || !textInfo || !startImportBtn) return;
+
+  const raw = textArea.value.trim();
+
+  if (!raw) {
+    textInfo.classList.add('visible', 'error');
+    textInfo.innerHTML = `<p><strong>❌ Keine Daten vorhanden</strong></p><p>Bitte JSON-Daten einfügen</p>`;
+    importedData = null;
+    startImportBtn.disabled = true;
+    return;
+  }
+
+  try {
+    const data = JSON.parse(raw);
+    const parsed = timeImportService.parseImportData(data);
+
+    importedData = parsed;
+
+    textInfo.classList.add('visible');
+    textInfo.classList.remove('error');
+    textInfo.innerHTML = `<p><strong>✅ JSON erfolgreich geparst</strong></p><p>${parsed.totalDays} Tag(e) gefunden</p><p>Zeitraum: ${parsed.dateRange.start} bis ${parsed.dateRange.end}</p>`;
+    startImportBtn.disabled = false;
+  } catch (err) {
+    textInfo.classList.add('visible', 'error');
+    textInfo.innerHTML = `<p><strong>❌ Fehler beim Parsen:</strong></p><p>${err.message}</p>`;
+    importedData = null;
+    startImportBtn.disabled = true;
+  }
+}
+
+// Handle start import
+async function handleStartImport() {
+  if (!importedData) {
+    alert('Bitte zuerst eine Datei auswählen oder Text validieren!');
+    return;
+  }
+
+  if (!currentWorkProfile) {
+    alert('Bitte zuerst Profil speichern!');
+    return;
+  }
+
+  const startBtn = document.getElementById('startImport');
+  if (!startBtn) return;
+
+  startBtn.disabled = true;
+  startBtn.textContent = 'Importiere...';
+
+  const resultSection = document.getElementById('importResultSection');
+  const progressSection = document.getElementById('importProgressSection');
+  if (resultSection) resultSection.style.display = 'none';
+  if (progressSection) progressSection.style.display = 'block';
+
+  uiLogService.clear('importProgressLog');
+
+  try {
+    // Initialize services for import
+    const apiClient = new PersonioAPIClient(currentWorkProfile.personioInstance, authManager);
+    const timesheetService = new TimesheetService(apiClient);
+    const attendanceService = new AttendanceService(apiClient, timesheetService);
+
+    // Use workflow service for the import process
+    await workflowService.recordImportedDays(currentWorkProfile, importedData, {
+      apiClient,
+      timesheetService,
+      attendanceService,
+      storageManager,
+      timeImportService
+    });
+  } catch (e) {
+    uiLogService.addLog('importProgressLog', `❌ Fehler: ${e.message}`, true);
+    alert('Fehler beim Import:\n\n' + e.message);
+  } finally {
+    startBtn.disabled = false;
+    startBtn.textContent = 'Import starten';
+  }
 }
 
