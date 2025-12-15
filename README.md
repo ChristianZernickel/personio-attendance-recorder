@@ -1,8 +1,14 @@
 # Personio Attendance Recorder - Chrome Extension
 
-Automatische Zeiterfassung für Personio mit zwei Modi: Profil-basiert oder Import aus JSON-Datei.
+> **Automatische Zeiterfassung für Personio** | Version 0.3.0
 
-## 🚀 Installation (Entwicklermodus)
+Automatische Zeiterfassung für Personio mit zwei Modi: **Profil-basiert** oder **Import aus JSON-Datei**.
+
+## 🚀 Quick Start
+
+**Neu hier?** → [Quick Start Guide](./docs/01-QUICK-START.md) - In 5 Minuten einsatzbereit!
+
+## 📦 Installation (Entwicklermodus)
 
 1. Chrome öffnen und zu `chrome://extensions/` navigieren
 2. "Entwicklermodus" oben rechts aktivieren
@@ -122,27 +128,20 @@ personio-attendance-recorder/
 
 ## 📚 Dokumentation
 
-### Quick Start
-- 🚀 [Time Import Quick Start](./docs/TIME_IMPORT_QUICKSTART.md) - Schnelleinstieg für JSON-Import
-- ✅ [Test Checklist](./docs/TEST_CHECKLIST.md) - Komplette Test-Checkliste
+### 🎯 Für Benutzer
+- **[📖 Quick Start](./docs/01-QUICK-START.md)** - In 5 Minuten einsatzbereit
+- **[📘 User Guide](./docs/02-USER-GUIDE.md)** - Vollständige Bedienungsanleitung
+- **[📋 Feature Overview](./docs/03-FEATURE-OVERVIEW.md)** - Alle Features im Überblick
+- **[🔍 Troubleshooting](./docs/troubleshooting/COMMON-ISSUES.md)** - Problemlösungen
 
-### Features
-- 📋 [Feature Summary](./docs/FEATURE_SUMMARY.md) - Übersicht aller Features
-- 📅 [Per-Day Schedule](./docs/PER_DAY_SCHEDULE_FEATURE.md) - Pro-Tag Arbeitszeitkonfiguration
-- 📥 [Time Import Feature](./docs/TIME_IMPORT_FEATURE.md) - Import-Feature Spezifikation
-- 🔧 [Time Import Implementation](./docs/TIME_IMPORT_IMPLEMENTATION.md) - Technische Details
+### 🛠️ Für Entwickler
+- **[🏗️ Architecture](./docs/10-ARCHITECTURE.md)** - System-Architektur
+- **[📁 Code Structure](./docs/11-CODE-STRUCTURE.md)** - Dateistruktur
+- **[🔧 Service Layer](./docs/12-SERVICE-LAYER.md)** - Service APIs
+- **[🧪 Testing](./docs/31-TESTING.md)** - Test-Strategien
 
-### Technical Documentation
-- 📖 [Knowledge Base](./docs/knowledge-base.md) - Technisches Wissen
-- 🏗️ [Architecture](./docs/architecture.md) - System-Architektur
-- 📡 [API Reference](./docs/api-reference.md) - Personio API Details
-- 📝 [Requirements](./docs/anforderungskatalog.md) - Anforderungskatalog
-- 💡 [Implementation Notes](./docs/IMPLEMENTATION_NOTES.md) - Implementierungs-Notizen
-
-### Troubleshooting
-- 🔍 [Session Refresh Discovery](./docs/SESSION_REFRESH_DISCOVERY.md)
-- 🔧 [Header Name Fix](./docs/HEADER_NAME_FIX.md)
-- 📄 [Content Script Solution](./docs/CONTENT_SCRIPT_SOLUTION.md)
+### 📚 Vollständiger Index
+→ **[Dokumentations-Index](./docs/00-INDEX.md)** - Alle Dokumentationen auf einen Blick
 
 ## 🐛 Debugging
 
@@ -168,33 +167,55 @@ personio-attendance-recorder/
 
 ## 📝 Version & Changelog
 
+### **v0.3.0** - Documentation & Refactoring (2025-12-15)
+**Improvements:**
+- 📚 Komplett überarbeitete Dokumentation
+- 🗂️ Neue hierarchische Dokumentationsstruktur
+- 📖 Quick Start Guide + User Guide
+- 🏗️ Detaillierte Architektur-Dokumentation
+- 🧹 Code-Refactoring und Bereinigung
+
+**Documentation:**
+- [00-INDEX.md](./docs/00-INDEX.md) - Dokumentations-Index
+- [01-QUICK-START.md](./docs/01-QUICK-START.md) - Quick Start Guide
+- [02-USER-GUIDE.md](./docs/02-USER-GUIDE.md) - User Guide
+- [10-ARCHITECTURE.md](./docs/10-ARCHITECTURE.md) - Architecture Overview
+
+### **v0.2.1** - Multi-Month Import (2025-12-01)
+**New Features:**
+- ✨ Multi-Month Import Support
+- 🔧 Code Modularisierung (574 → 465 LOC)
+
+**Improvements:**
+- Automatisches Laden mehrerer Monate
+- Kombiniertes Timesheet für nahtlose Verarbeitung
+- Unterstützung für Jahreswechsel
+
+**Documentation:**
+- [MULTI_MONTH_IMPORT.md](./docs/MULTI_MONTH_IMPORT.md)
+- [CODE_STRUCTURE.md](./docs/CODE_STRUCTURE.md)
+
 ### **v0.2.0** - Time Import Feature (2025-11-14)
 **New Features:**
 - ✨ JSON-Datei Import für Arbeitszeiten
 - ✨ Tab-Navigation (Profil / Import)
-- ✨ Automatische Pausen-Erkennung aus Zeitlücken
-- ✨ UTC → Lokale Zeitzone Konvertierung
-- ✨ Multi-Tag Import Support
+- ✨ Automatische Pausen-Erkennung
 
 **Improvements:**
-- 🎨 Neue Tab-basierte UI
-- 📦 Separate Progress/Result Sections für beide Modi
-- 🔧 Intelligente Perioden-Generierung (Import vs. Profil)
-- 📊 Erweiterte Validierung & Fehlerbehandlung
+- Per-Day Schedule (individuelle Zeiten pro Wochentag)
+- Text-Eingabe Methode
+- Intelligente Perioden-Generierung
 
-**Technical:**
-- `TimeImportService` hinzugefügt
-- `AttendanceService` unterstützt beide Modi
-- Import-spezifische Perioden-Struktur
-- Lücken < 1 Min werden zusammengefasst
-- Lücken >= 1 Min werden als Pause eingetragen
+**Documentation:**
+- [TIME_IMPORT_FEATURE.md](./docs/TIME_IMPORT_FEATURE.md)
+- [PER_DAY_SCHEDULE_FEATURE.md](./docs/PER_DAY_SCHEDULE_FEATURE.md)
 
 ### **v0.1.0** - Initial Release (2025-11-10)
 - ✅ Profil-basierte Zeiterfassung
-- ✅ Pro-Tag Arbeitszeitkonfiguration (Mo-So)
 - ✅ Cookie-basierte Authentifizierung
 - ✅ Automatische Timesheet-Integration
-- ✅ Retry-Logik & Fehlerbehandlung
+
+**Siehe:** [CHANGELOG.md](./CHANGELOG.md) für vollständige Versionshistorie
 
 ## ⚠️ Hinweise
 

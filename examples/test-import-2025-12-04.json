@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "start": "20251204T080000Z",
+    "end": "20251204T090000Z",
+    "tags": ["morning-work"]
+  },
+  {
+    "id": 2,
+    "start": "20251204T090000Z",
+    "end": "20251204T100000Z",
+    "tags": ["project-alpha"]
+  },
+  {
+    "id": 3,
+    "start": "20251204T100000Z",
+    "end": "20251204T110000Z",
+    "tags": ["meeting", "team-sync"]
+  },
+  {
+    "id": 4,
+    "start": "20251204T110000Z",
+    "end": "20251204T120000Z",
+    "tags": ["project-beta"]
+  },
+  {
+    "id": 5,
+    "start": "20251204T130000Z",
+    "end": "20251204T140000Z",
+    "tags": ["afternoon-work"]
+  },
+  {
+    "id": 6,
+    "start": "20251204T140000Z",
+    "end": "20251204T150000Z",
+    "tags": ["code-review"]
+  },
+  {
+    "id": 7,
+    "start": "20251204T150000Z",
+    "end": "20251204T160000Z",
+    "tags": ["documentation"]
+  },
+  {
+    "id": 8,
+    "start": "20251204T160000Z",
+    "end": "20251204T170000Z",
+    "tags": ["daily-standup", "wrap-up"]
+  }
+]
+

@@ -2,6 +2,33 @@
 
 Alle wichtigen Änderungen an diesem Projekt werden in dieser Datei dokumentiert.
 
+## [0.3.0] - 2025-12-15
+
+### Added
+- 📚 **Komplett überarbeitete Dokumentation**: Neue hierarchische Struktur mit klarer Navigation
+  - [00-INDEX.md](./docs/00-INDEX.md) - Zentraler Dokumentations-Index
+  - [01-QUICK-START.md](./docs/01-QUICK-START.md) - Quick Start Guide für neue Benutzer
+  - [02-USER-GUIDE.md](./docs/02-USER-GUIDE.md) - Vollständige Bedienungsanleitung
+  - [10-ARCHITECTURE.md](./docs/10-ARCHITECTURE.md) - Detaillierte Architektur-Dokumentation
+- 📝 **Test-Dateien**: Neue Test-JSON für aktuelles Datum (test-import-2025-12-04.json)
+
+### Changed
+- 🗂️ **Dokumentations-Struktur**: Von flacher zu hierarchischer Organisation
+  - Benutzer-Dokumentation (01-06)
+  - Entwickler-Dokumentation (10-39)
+  - Technische Referenz (Services, Utils)
+  - Troubleshooting & FAQs
+- 📖 **README.md**: Aktualisiert mit Links zur neuen Dokumentationsstruktur
+- 🏗️ **Architecture Documentation**: Erweitert mit Service Layer Details und Design Patterns
+
+### Documentation
+- Alle Dokumente folgen jetzt einem einheitlichen Format
+- Verbesserte Navigation zwischen Dokumenten
+- Klare Zielgruppen-Trennung (Benutzer vs. Entwickler)
+- Vollständige API-Referenz für alle Services
+
+---
+
 ## [0.2.1] - 2025-12-01
 
 ### Added

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Personio Attendance Recorder",
-  "version": "0.2.1",
-  "description": "Automatische Zeiterfassung für Personio - Profil-basiert oder JSON-Import (Multi-Month Support)",
+  "version": "0.3.0",
+  "description": "Automatische Zeiterfassung für Personio - Profil-basiert oder JSON-Import (Multi-Month Support + Überarbeitete Dokumentation)",
   "permissions": [
     "cookies",
     "storage",
